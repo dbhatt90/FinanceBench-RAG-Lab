@@ -1,0 +1,10 @@
+.env, 
+data/raw/, 
+qdrant_storage/,
+__pycache__/, 
+.venv/, 
+*.ipynb_checkpoints
+
+RAG_14_Day_Mastery_Plan.md
+RAG_14_Day_Curated_Plan.md
+Architecture_Impl.png
