@@ -4,7 +4,16 @@ qdrant_storage/,
 __pycache__/, 
 .venv/, 
 *.ipynb_checkpoints
+*.pyc
 
 RAG_14_Day_Mastery_Plan.md
 RAG_14_Day_Curated_Plan.md
 Architecture_Impl.png
+docs/
+qdrant_storage/
+src/rag.egg-info
+
+*.json
+!eval_results/day1_smoke.json
+*.DS_Store
+.env

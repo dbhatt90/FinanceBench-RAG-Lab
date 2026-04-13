@@ -1,0 +1,22 @@
+[project]
+name = "rag"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "google-cloud-aiplatform>=1.147.0",
+    "google-genai>=1.72.0",
+    "langchain>=1.2.15",
+    "langchain-community>=0.4.1",
+    "langchain-google-genai>=4.2.1",
+    "langchain-google-vertexai>=3.2.2",
+    "langchain-groq>=1.1.2",
+    "pdfplumber>=0.11.9",
+    "python-dotenv>=1.2.2",
+    "qdrant-client>=1.17.1",
+    "unstructured[pdf]>=0.22.18",
+]
+[tool.setuptools.packages.find]
+where = ["src"]
+
