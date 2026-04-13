@@ -5,3 +5,6 @@ Build production-grade RAG systems from scratch, covering **Query Construction â
 
 ### Day 0
 Setup + Data Collection
+
+### Day 1 â€” Foundations & End-to-End Baseline
+Implement Hit@5, ExactMatch, and token_F1 for smoke evaluation
