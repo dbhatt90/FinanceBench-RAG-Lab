@@ -16,3 +16,4 @@ src/rag.egg-info
 *.json
 !eval_results/day1_smoke.json
 *.DS_Store
+.env
