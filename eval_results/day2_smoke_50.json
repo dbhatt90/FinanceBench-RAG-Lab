@@ -1,0 +1,1495 @@
+{
+  "timestamp": "2026-04-13T23:46:54.096411",
+  "n_questions": 50,
+  "k": 5,
+  "summary": {
+    "dense": {
+      "recall@5": 0.78,
+      "precision@5": 0.204,
+      "mrr": 0.6923,
+      "map@5": 0.643,
+      "hit@5": 0.82
+    },
+    "bm25": {
+      "recall@5": 0.15,
+      "precision@5": 0.032,
+      "mrr": 0.0967,
+      "map@5": 0.0917,
+      "hit@5": 0.16
+    },
+    "hybrid": {
+      "recall@5": 0.69,
+      "precision@5": 0.176,
+      "mrr": 0.5787,
+      "map@5": 0.5193,
+      "hit@5": 0.76
+    }
+  },
+  "results": [
+    {
+      "question_id": 0,
+      "question": "Taking into account the information outlined in the income statement, what is the FY2019 - FY2021 3 year average unadjusted operating income % margin for Corning? Answer in units of percents and round to one decimal place.",
+      "doc_name": "CORNING_2021_10K",
+      "gold_pages": [
+        64
+      ],
+      "dense": {
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "mrr": 1.0,
+        "map@5": 1.0,
+        "hit@5": 1
+      },
+      "bm25": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      },
+      "hybrid": {
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "mrr": 1.0,
+        "map@5": 1.0,
+        "hit@5": 1
+      }
+    },
+    {
+      "question_id": 1,
+      "question": "Are there any product categories / service categories that represent more than 20% of Boeing's revenue for FY2022?",
+      "doc_name": "BOEING_2022_10K",
+      "gold_pages": [
+        61
+      ],
+      "dense": {
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "mrr": 1.0,
+        "map@5": 1.0,
+        "hit@5": 1
+      },
+      "bm25": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      },
+      "hybrid": {
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "mrr": 1.0,
+        "map@5": 1.0,
+        "hit@5": 1
+      }
+    },
+    {
+      "question_id": 2,
+      "question": "Which of JPM's business segments had the lowest net revenue in 2021 Q1?",
+      "doc_name": "JPMORGAN_2021Q1_10Q",
+      "gold_pages": [
+        18
+      ],
+      "dense": {
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "mrr": 1.0,
+        "map@5": 1.0,
+        "hit@5": 1
+      },
+      "bm25": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      },
+      "hybrid": {
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "mrr": 0.3333333333333333,
+        "map@5": 0.3333333333333333,
+        "hit@5": 1
+      }
+    },
+    {
+      "question_id": 3,
+      "question": "What is Coca Cola's FY2022 dividend payout ratio (using total cash dividends paid and net income attributable to shareholders)? Round answer to two decimal places. Answer the question asked by assuming you only have access to information clearly displayed in the cash flow statement and the income statement.",
+      "doc_name": "COCACOLA_2022_10K",
+      "gold_pages": [
+        65,
+        62
+      ],
+      "dense": {
+        "recall@5": 1.0,
+        "precision@5": 0.4,
+        "mrr": 0.5,
+        "map@5": 0.5,
+        "hit@5": 1
+      },
+      "bm25": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      },
+      "hybrid": {
+        "recall@5": 0.5,
+        "precision@5": 0.2,
+        "mrr": 0.3333333333333333,
+        "map@5": 0.16666666666666666,
+        "hit@5": 1
+      }
+    },
+    {
+      "question_id": 4,
+      "question": "What are major acquisitions that Best Buy has done in FY2023, FY2022 and FY2021?",
+      "doc_name": "BESTBUY_2023_10K",
+      "gold_pages": [
+        50
+      ],
+      "dense": {
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "mrr": 1.0,
+        "map@5": 1.0,
+        "hit@5": 1
+      },
+      "bm25": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      },
+      "hybrid": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      }
+    },
+    {
+      "question_id": 5,
+      "question": "What is the amount of the cash proceeds that JnJ realised from the separation of Kenvue (formerly Consumer Health business segment), as of August 30, 2023?",
+      "doc_name": "JOHNSON_JOHNSON_2023_8K_dated-2023-08-30",
+      "gold_pages": [
+        3
+      ],
+      "dense": {
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "mrr": 1.0,
+        "map@5": 1.0,
+        "hit@5": 1
+      },
+      "bm25": {
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "mrr": 1.0,
+        "map@5": 1.0,
+        "hit@5": 1
+      },
+      "hybrid": {
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "mrr": 1.0,
+        "map@5": 1.0,
+        "hit@5": 1
+      }
+    },
+    {
+      "question_id": 6,
+      "question": "Using the cash flow statement, answer the following question to the best of your abilities: how much did Block (formerly known as Square) generate in cash flow from operating activities in FY2020? Answer in USD millions.",
+      "doc_name": "BLOCK_2020_10K",
+      "gold_pages": [
+        89
+      ],
+      "dense": {
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "mrr": 1.0,
+        "map@5": 1.0,
+        "hit@5": 1
+      },
+      "bm25": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      },
+      "hybrid": {
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "mrr": 0.5,
+        "map@5": 0.5,
+        "hit@5": 1
+      }
+    },
+    {
+      "question_id": 7,
+      "question": "What drove gross margin change as of the FY2022 for American Express? If gross margin is not a useful metric for a company like this, then please state that and explain why.",
+      "doc_name": "AMERICANEXPRESS_2022_10K",
+      "gold_pages": [
+        95
+      ],
+      "dense": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      },
+      "bm25": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      },
+      "hybrid": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      }
+    },
+    {
+      "question_id": 8,
+      "question": "Is growth in JnJ's adjusted EPS expected to accelerate in FY2023?",
+      "doc_name": "JOHNSON_JOHNSON_2022Q4_EARNINGS",
+      "gold_pages": [
+        0
+      ],
+      "dense": {
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "mrr": 0.5,
+        "map@5": 0.5,
+        "hit@5": 1
+      },
+      "bm25": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      },
+      "hybrid": {
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "mrr": 1.0,
+        "map@5": 1.0,
+        "hit@5": 1
+      }
+    },
+    {
+      "question_id": 9,
+      "question": "What is Amcor's year end FY2020 net AR (in USD millions)? Address the question by adopting the perspective of a financial analyst who can only use the details shown within the balance sheet.",
+      "doc_name": "AMCOR_2020_10K",
+      "gold_pages": [
+        49
+      ],
+      "dense": {
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "mrr": 1.0,
+        "map@5": 1.0,
+        "hit@5": 1
+      },
+      "bm25": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      },
+      "hybrid": {
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "mrr": 1.0,
+        "map@5": 1.0,
+        "hit@5": 1
+      }
+    },
+    {
+      "question_id": 10,
+      "question": "Does AMD have a reasonably healthy liquidity profile based on its quick ratio for FY22? If the quick ratio is not relevant to measure liquidity, please state that and explain why.",
+      "doc_name": "AMD_2022_10K",
+      "gold_pages": [
+        55
+      ],
+      "dense": {
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "mrr": 1.0,
+        "map@5": 1.0,
+        "hit@5": 1
+      },
+      "bm25": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      },
+      "hybrid": {
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "mrr": 1.0,
+        "map@5": 1.0,
+        "hit@5": 1
+      }
+    },
+    {
+      "question_id": 11,
+      "question": "Was there any drop in Cash & Cash equivalents between FY 2023 and Q2 of FY2024?",
+      "doc_name": "BESTBUY_2024Q2_10Q",
+      "gold_pages": [
+        19
+      ],
+      "dense": {
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "mrr": 0.5,
+        "map@5": 0.5,
+        "hit@5": 1
+      },
+      "bm25": {
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "mrr": 0.25,
+        "map@5": 0.25,
+        "hit@5": 1
+      },
+      "hybrid": {
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "mrr": 0.5,
+        "map@5": 0.5,
+        "hit@5": 1
+      }
+    },
+    {
+      "question_id": 12,
+      "question": "You are an investment banker and your only resource(s) to answer the following question is (are): the statement of financial position and the cash flow statement. Here's the question: what is the FY2015 operating cash flow ratio for Adobe? Operating cash flow ratio is defined as: cash from operations / total current liabilities. Round your answer to two decimal places.",
+      "doc_name": "ADOBE_2015_10K",
+      "gold_pages": [
+        58,
+        62
+      ],
+      "dense": {
+        "recall@5": 1.0,
+        "precision@5": 0.4,
+        "mrr": 1.0,
+        "map@5": 0.8333333333333333,
+        "hit@5": 1
+      },
+      "bm25": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      },
+      "hybrid": {
+        "recall@5": 1.0,
+        "precision@5": 0.4,
+        "mrr": 1.0,
+        "map@5": 0.7,
+        "hit@5": 1
+      }
+    },
+    {
+      "question_id": 13,
+      "question": "Does Adobe have an improving operating margin profile as of FY2022? If operating margin is not a useful metric for a company like this, then state that and explain why.",
+      "doc_name": "ADOBE_2022_10K",
+      "gold_pages": [
+        53
+      ],
+      "dense": {
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "mrr": 1.0,
+        "map@5": 1.0,
+        "hit@5": 1
+      },
+      "bm25": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      },
+      "hybrid": {
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "mrr": 0.5,
+        "map@5": 0.5,
+        "hit@5": 1
+      }
+    },
+    {
+      "question_id": 14,
+      "question": "What is the nature & purpose of AMCOR's restructuring liability as oF Q2 of FY2023 close?",
+      "doc_name": "AMCOR_2023Q2_10Q",
+      "gold_pages": [
+        14
+      ],
+      "dense": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      },
+      "bm25": {
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "mrr": 0.25,
+        "map@5": 0.25,
+        "hit@5": 1
+      },
+      "hybrid": {
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "mrr": 1.0,
+        "map@5": 1.0,
+        "hit@5": 1
+      }
+    },
+    {
+      "question_id": 15,
+      "question": "What is the FY2022 unadjusted EBITDA less capex for PepsiCo? Define unadjusted EBITDA as unadjusted operating income + depreciation and amortization [from cash flow statement]. Answer in USD millions. Respond to the question by assuming the perspective of an investment analyst who can only use the details shown within the statement of cash flows and the income statement.",
+      "doc_name": "PEPSICO_2022_10K",
+      "gold_pages": [
+        61,
+        63
+      ],
+      "dense": {
+        "recall@5": 0.5,
+        "precision@5": 0.2,
+        "mrr": 1.0,
+        "map@5": 0.5,
+        "hit@5": 1
+      },
+      "bm25": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      },
+      "hybrid": {
+        "recall@5": 0.5,
+        "precision@5": 0.2,
+        "mrr": 1.0,
+        "map@5": 0.5,
+        "hit@5": 1
+      }
+    },
+    {
+      "question_id": 16,
+      "question": "Which debt securities are registered to trade on a national securities exchange under Ulta Beauty's name as of FY2023?",
+      "doc_name": "ULTABEAUTY_2023_10K",
+      "gold_pages": [
+        0
+      ],
+      "dense": {
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "mrr": 1.0,
+        "map@5": 1.0,
+        "hit@5": 1
+      },
+      "bm25": {
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "mrr": 1.0,
+        "map@5": 1.0,
+        "hit@5": 1
+      },
+      "hybrid": {
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "mrr": 1.0,
+        "map@5": 1.0,
+        "hit@5": 1
+      }
+    },
+    {
+      "question_id": 17,
+      "question": "What drove the increase in Ulta Beauty's merchandise inventories balance at end of FY2023?",
+      "doc_name": "ULTABEAUTY_2023Q4_EARNINGS",
+      "gold_pages": [
+        2
+      ],
+      "dense": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      },
+      "bm25": {
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "mrr": 0.5,
+        "map@5": 0.5,
+        "hit@5": 1
+      },
+      "hybrid": {
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "mrr": 0.2,
+        "map@5": 0.2,
+        "hit@5": 1
+      }
+    },
+    {
+      "question_id": 18,
+      "question": "Using only the information within the balance sheet, how much total assets did Costco have at the end of FY2021? Answer in USD millions.",
+      "doc_name": "COSTCO_2021_10K",
+      "gold_pages": [
+        37
+      ],
+      "dense": {
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "mrr": 1.0,
+        "map@5": 1.0,
+        "hit@5": 1
+      },
+      "bm25": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      },
+      "hybrid": {
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "mrr": 1.0,
+        "map@5": 1.0,
+        "hit@5": 1
+      }
+    },
+    {
+      "question_id": 19,
+      "question": "Has Boeing reported any materially important ongoing legal battles from FY2022?",
+      "doc_name": "BOEING_2022_10K",
+      "gold_pages": [
+        112
+      ],
+      "dense": {
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "mrr": 1.0,
+        "map@5": 1.0,
+        "hit@5": 1
+      },
+      "bm25": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      },
+      "hybrid": {
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "mrr": 1.0,
+        "map@5": 1.0,
+        "hit@5": 1
+      }
+    },
+    {
+      "question_id": 20,
+      "question": "By drawing conclusions from the information stated only in the income statement, what is Amazon's FY2019 net income attributable to shareholders (in USD millions)?",
+      "doc_name": "AMAZON_2019_10K",
+      "gold_pages": [
+        37
+      ],
+      "dense": {
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "mrr": 1.0,
+        "map@5": 1.0,
+        "hit@5": 1
+      },
+      "bm25": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      },
+      "hybrid": {
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "mrr": 1.0,
+        "map@5": 1.0,
+        "hit@5": 1
+      }
+    },
+    {
+      "question_id": 21,
+      "question": "Does AMCOR have an improving gross margin profile as of FY2023? If gross margin is not a useful metric for a company like this, then state that and explain why.",
+      "doc_name": "AMCOR_2023_10K",
+      "gold_pages": [
+        49
+      ],
+      "dense": {
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "mrr": 1.0,
+        "map@5": 1.0,
+        "hit@5": 1
+      },
+      "bm25": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      },
+      "hybrid": {
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "mrr": 1.0,
+        "map@5": 1.0,
+        "hit@5": 1
+      }
+    },
+    {
+      "question_id": 22,
+      "question": "Was American Express able to retain card members during 2022?",
+      "doc_name": "AMERICANEXPRESS_2022_10K",
+      "gold_pages": [
+        44
+      ],
+      "dense": {
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "mrr": 0.5,
+        "map@5": 0.5,
+        "hit@5": 1
+      },
+      "bm25": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      },
+      "hybrid": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      }
+    },
+    {
+      "question_id": 23,
+      "question": "What is the FY2017 - FY2019 3 year average of capex as a % of revenue for Activision Blizzard? Answer in units of percents and round to one decimal place. Calculate (or extract) the answer from the statement of income and the cash flow statement.",
+      "doc_name": "ACTIVISIONBLIZZARD_2019_10K",
+      "gold_pages": [
+        72,
+        69
+      ],
+      "dense": {
+        "recall@5": 1.0,
+        "precision@5": 0.4,
+        "mrr": 1.0,
+        "map@5": 1.0,
+        "hit@5": 1
+      },
+      "bm25": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      },
+      "hybrid": {
+        "recall@5": 1.0,
+        "precision@5": 0.4,
+        "mrr": 1.0,
+        "map@5": 0.8333333333333333,
+        "hit@5": 1
+      }
+    },
+    {
+      "question_id": 24,
+      "question": "Which debt securities are registered to trade on a national securities exchange under 3M's name as of Q2 of 2023?",
+      "doc_name": "3M_2023Q2_10Q",
+      "gold_pages": [
+        0
+      ],
+      "dense": {
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "mrr": 1.0,
+        "map@5": 1.0,
+        "hit@5": 1
+      },
+      "bm25": {
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "mrr": 0.3333333333333333,
+        "map@5": 0.3333333333333333,
+        "hit@5": 1
+      },
+      "hybrid": {
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "mrr": 1.0,
+        "map@5": 1.0,
+        "hit@5": 1
+      }
+    },
+    {
+      "question_id": 25,
+      "question": "What was the key agenda of the AMCOR's 8k filing dated 1st July 2022?",
+      "doc_name": "AMCOR_2022_8K_dated-2022-07-01",
+      "gold_pages": [
+        1
+      ],
+      "dense": {
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "mrr": 0.3333333333333333,
+        "map@5": 0.3333333333333333,
+        "hit@5": 1
+      },
+      "bm25": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      },
+      "hybrid": {
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "mrr": 0.2,
+        "map@5": 0.2,
+        "hit@5": 1
+      }
+    },
+    {
+      "question_id": 26,
+      "question": "Answer the following question as if you are an equity research analyst and have lost internet connection so you do not have access to financial metric providers. According to the details clearly outlined within the P&L statement and the statement of cash flows, what is the FY2015 depreciation and amortization (D&A from cash flow statement) % margin for AMD?",
+      "doc_name": "AMD_2015_10K",
+      "gold_pages": [
+        59,
+        55
+      ],
+      "dense": {
+        "recall@5": 1.0,
+        "precision@5": 0.4,
+        "mrr": 1.0,
+        "map@5": 0.8333333333333333,
+        "hit@5": 1
+      },
+      "bm25": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      },
+      "hybrid": {
+        "recall@5": 1.0,
+        "precision@5": 0.4,
+        "mrr": 1.0,
+        "map@5": 0.7,
+        "hit@5": 1
+      }
+    },
+    {
+      "question_id": 27,
+      "question": "What are the major products and services that AMD sells as of FY22?",
+      "doc_name": "AMD_2022_10K",
+      "gold_pages": [
+        3
+      ],
+      "dense": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      },
+      "bm25": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      },
+      "hybrid": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      }
+    },
+    {
+      "question_id": 28,
+      "question": "Was there any change in the number of Best Buy stores between Q2 of FY2024 and FY2023?",
+      "doc_name": "BESTBUY_2024Q2_10Q",
+      "gold_pages": [
+        16
+      ],
+      "dense": {
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "mrr": 1.0,
+        "map@5": 1.0,
+        "hit@5": 1
+      },
+      "bm25": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      },
+      "hybrid": {
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "mrr": 0.5,
+        "map@5": 0.5,
+        "hit@5": 1
+      }
+    },
+    {
+      "question_id": 29,
+      "question": "What is Kraft Heinz's FY2019 inventory turnover ratio? Inventory turnover ratio is defined as: (FY2019 COGS) / (average inventory between FY2018 and FY2019). Round your answer to two decimal places. Please base your judgments on the information provided primarily in the balance sheet and the P&L statement.",
+      "doc_name": "KRAFTHEINZ_2019_10K",
+      "gold_pages": [
+        49,
+        51
+      ],
+      "dense": {
+        "recall@5": 1.0,
+        "precision@5": 0.4,
+        "mrr": 1.0,
+        "map@5": 1.0,
+        "hit@5": 1
+      },
+      "bm25": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      },
+      "hybrid": {
+        "recall@5": 1.0,
+        "precision@5": 0.4,
+        "mrr": 1.0,
+        "map@5": 0.8333333333333333,
+        "hit@5": 1
+      }
+    },
+    {
+      "question_id": 30,
+      "question": "Has CVS Health reported any materially important ongoing legal battles from 2022, 2021 and 2020?",
+      "doc_name": "CVSHEALTH_2022_10K",
+      "gold_pages": [
+        172,
+        173
+      ],
+      "dense": {
+        "recall@5": 0.5,
+        "precision@5": 0.2,
+        "mrr": 1.0,
+        "map@5": 0.5,
+        "hit@5": 1
+      },
+      "bm25": {
+        "recall@5": 0.5,
+        "precision@5": 0.2,
+        "mrr": 0.5,
+        "map@5": 0.25,
+        "hit@5": 1
+      },
+      "hybrid": {
+        "recall@5": 0.5,
+        "precision@5": 0.2,
+        "mrr": 1.0,
+        "map@5": 0.5,
+        "hit@5": 1
+      }
+    },
+    {
+      "question_id": 31,
+      "question": "Did Pfizer grow its PPNE between FY20 and FY21?",
+      "doc_name": "PFIZER_2021_10K",
+      "gold_pages": [
+        58
+      ],
+      "dense": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      },
+      "bm25": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      },
+      "hybrid": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      }
+    },
+    {
+      "question_id": 32,
+      "question": "What is the FY2021 capital expenditure amount (in USD billions) for PepsiCo? Respond to the question by assuming the perspective of an investment analyst who can only use the details shown within the statement of cash flows.",
+      "doc_name": "PEPSICO_2021_10K",
+      "gold_pages": [
+        62
+      ],
+      "dense": {
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "mrr": 1.0,
+        "map@5": 1.0,
+        "hit@5": 1
+      },
+      "bm25": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      },
+      "hybrid": {
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "mrr": 1.0,
+        "map@5": 1.0,
+        "hit@5": 1
+      }
+    },
+    {
+      "question_id": 33,
+      "question": "What is the quantity of restructuring costs directly outlined in Pepsico's income statements for FY2022? If restructuring costs are not explicitly outlined then state 0.",
+      "doc_name": "PEPSICO_2022_10K",
+      "gold_pages": [
+        77
+      ],
+      "dense": {
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "mrr": 0.25,
+        "map@5": 0.25,
+        "hit@5": 1
+      },
+      "bm25": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      },
+      "hybrid": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      }
+    },
+    {
+      "question_id": 34,
+      "question": "What drove the reduction in SG&A expense as a percent of net sales in FY2023?",
+      "doc_name": "ULTABEAUTY_2023Q4_EARNINGS",
+      "gold_pages": [
+        1
+      ],
+      "dense": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      },
+      "bm25": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      },
+      "hybrid": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      }
+    },
+    {
+      "question_id": 35,
+      "question": "What is the FY2017 return on assets (ROA) for Coca Cola? ROA is defined as: FY2017 net income / (average total assets between FY2016 and FY2017). Round your answer to two decimal places. Give a response to the question by relying on the details shown in the balance sheet and the P&L statement.",
+      "doc_name": "COCACOLA_2017_10K",
+      "gold_pages": [
+        73,
+        75
+      ],
+      "dense": {
+        "recall@5": 1.0,
+        "precision@5": 0.4,
+        "mrr": 0.5,
+        "map@5": 0.5833333333333333,
+        "hit@5": 1
+      },
+      "bm25": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      },
+      "hybrid": {
+        "recall@5": 1.0,
+        "precision@5": 0.4,
+        "mrr": 0.3333333333333333,
+        "map@5": 0.3666666666666667,
+        "hit@5": 1
+      }
+    },
+    {
+      "question_id": 36,
+      "question": "Does American Water Works have positive working capital based on FY2022 data? If working capital is not a useful or relevant metric for this company, then please state that and explain why.",
+      "doc_name": "AMERICANWATERWORKS_2022_10K",
+      "gold_pages": [
+        80,
+        81
+      ],
+      "dense": {
+        "recall@5": 1.0,
+        "precision@5": 0.4,
+        "mrr": 0.3333333333333333,
+        "map@5": 0.41666666666666663,
+        "hit@5": 1
+      },
+      "bm25": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      },
+      "hybrid": {
+        "recall@5": 0.5,
+        "precision@5": 0.2,
+        "mrr": 0.2,
+        "map@5": 0.1,
+        "hit@5": 1
+      }
+    },
+    {
+      "question_id": 37,
+      "question": "Which business segment of JnJ will be treated as a discontinued operation from August 30, 2023 onward?",
+      "doc_name": "JOHNSON_JOHNSON_2023_8K_dated-2023-08-30",
+      "gold_pages": [
+        3
+      ],
+      "dense": {
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "mrr": 0.5,
+        "map@5": 0.5,
+        "hit@5": 1
+      },
+      "bm25": {
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "mrr": 1.0,
+        "map@5": 1.0,
+        "hit@5": 1
+      },
+      "hybrid": {
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "mrr": 1.0,
+        "map@5": 1.0,
+        "hit@5": 1
+      }
+    },
+    {
+      "question_id": 38,
+      "question": "What is the FY2018 - FY2020 3 year average unadjusted EBITDA % margin for Walmart? Define unadjusted EBITDA as unadjusted operating income + depreciation and amortization from the cash flow statement. Answer in units of percents and round to one decimal place. Calculate what was asked by utilizing the line items clearly shown in the P&L statement and the cash flow statement.",
+      "doc_name": "WALMART_2020_10K",
+      "gold_pages": [
+        50,
+        55
+      ],
+      "dense": {
+        "recall@5": 1.0,
+        "precision@5": 0.4,
+        "mrr": 1.0,
+        "map@5": 0.7,
+        "hit@5": 1
+      },
+      "bm25": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      },
+      "hybrid": {
+        "recall@5": 0.5,
+        "precision@5": 0.2,
+        "mrr": 1.0,
+        "map@5": 0.5,
+        "hit@5": 1
+      }
+    },
+    {
+      "question_id": 39,
+      "question": "Has Verizon increased its debt on balance sheet between 2022 and the 2021 fiscal period?",
+      "doc_name": "VERIZON_2022_10K",
+      "gold_pages": [
+        76
+      ],
+      "dense": {
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "mrr": 1.0,
+        "map@5": 1.0,
+        "hit@5": 1
+      },
+      "bm25": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      },
+      "hybrid": {
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "mrr": 0.3333333333333333,
+        "map@5": 0.3333333333333333,
+        "hit@5": 1
+      }
+    },
+    {
+      "question_id": 40,
+      "question": "As of FY2023Q1, why did Pepsico raise full year guidance for FY2023?",
+      "doc_name": "PEPSICO_2023Q1_EARNINGS",
+      "gold_pages": [
+        0
+      ],
+      "dense": {
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "mrr": 1.0,
+        "map@5": 1.0,
+        "hit@5": 1
+      },
+      "bm25": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      },
+      "hybrid": {
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "mrr": 1.0,
+        "map@5": 1.0,
+        "hit@5": 1
+      }
+    },
+    {
+      "question_id": 41,
+      "question": "We want to calculate a financial metric. Please help us compute it by basing your answers off of the cash flow statement and the income statement. Here's the question: what is the FY2022 retention ratio (using total cash dividends paid and net income attributable to shareholders) for General Mills? Round answer to two decimal places.",
+      "doc_name": "GENERALMILLS_2022_10K",
+      "gold_pages": [
+        48,
+        44
+      ],
+      "dense": {
+        "recall@5": 1.0,
+        "precision@5": 0.4,
+        "mrr": 1.0,
+        "map@5": 0.75,
+        "hit@5": 1
+      },
+      "bm25": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      },
+      "hybrid": {
+        "recall@5": 0.5,
+        "precision@5": 0.2,
+        "mrr": 0.3333333333333333,
+        "map@5": 0.16666666666666666,
+        "hit@5": 1
+      }
+    },
+    {
+      "question_id": 42,
+      "question": "Is CVS Health a capital-intensive business based on FY2022 data?",
+      "doc_name": "CVSHEALTH_2022_10K",
+      "gold_pages": [
+        107,
+        109
+      ],
+      "dense": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      },
+      "bm25": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      },
+      "hybrid": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      }
+    },
+    {
+      "question_id": 43,
+      "question": "Which region had the worst topline performance for MGM during FY2022?",
+      "doc_name": "MGMRESORTS_2022Q4_EARNINGS",
+      "gold_pages": [
+        2,
+        3
+      ],
+      "dense": {
+        "recall@5": 0.5,
+        "precision@5": 0.2,
+        "mrr": 0.5,
+        "map@5": 0.25,
+        "hit@5": 1
+      },
+      "bm25": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      },
+      "hybrid": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      }
+    },
+    {
+      "question_id": 44,
+      "question": "What is Adobe's year-over-year change in unadjusted operating income from FY2015 to FY2016 (in units of percents and round to one decimal place)? Give a solution to the question by using the income statement.",
+      "doc_name": "ADOBE_2016_10K",
+      "gold_pages": [
+        61
+      ],
+      "dense": {
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "mrr": 1.0,
+        "map@5": 1.0,
+        "hit@5": 1
+      },
+      "bm25": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      },
+      "hybrid": {
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "mrr": 1.0,
+        "map@5": 1.0,
+        "hit@5": 1
+      }
+    },
+    {
+      "question_id": 45,
+      "question": "What is the quantity of restructuring costs directly outlined in AES Corporation's income statements for FY2022? If restructuring costs are not explicitly outlined then state 0.",
+      "doc_name": "AES_2022_10K",
+      "gold_pages": [
+        131
+      ],
+      "dense": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      },
+      "bm25": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      },
+      "hybrid": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      }
+    },
+    {
+      "question_id": 46,
+      "question": "What Was AMCOR's Adjusted Non GAAP EBITDA for FY 2023",
+      "doc_name": "AMCOR_2023Q4_EARNINGS",
+      "gold_pages": [
+        11
+      ],
+      "dense": {
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "mrr": 0.2,
+        "map@5": 0.2,
+        "hit@5": 1
+      },
+      "bm25": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      },
+      "hybrid": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      }
+    },
+    {
+      "question_id": 47,
+      "question": "We want to calculate a financial metric. Please help us compute it by basing your answers off of the statement of income and the statement of cash flows. Here's the question: what is the FY2015 unadjusted EBITDA % margin for Netflix? Calculate unadjusted EBITDA using unadjusted operating income and D&A (from cash flow statement).",
+      "doc_name": "NETFLIX_2015_10K",
+      "gold_pages": [
+        41,
+        39
+      ],
+      "dense": {
+        "recall@5": 1.0,
+        "precision@5": 0.4,
+        "mrr": 1.0,
+        "map@5": 1.0,
+        "hit@5": 1
+      },
+      "bm25": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      },
+      "hybrid": {
+        "recall@5": 1.0,
+        "precision@5": 0.4,
+        "mrr": 0.3333333333333333,
+        "map@5": 0.3666666666666667,
+        "hit@5": 1
+      }
+    },
+    {
+      "question_id": 48,
+      "question": "Has Microsoft increased its debt on balance sheet between FY2023 and the FY2022 period?",
+      "doc_name": "MICROSOFT_2023_10K",
+      "gold_pages": [
+        59
+      ],
+      "dense": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      },
+      "bm25": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      },
+      "hybrid": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      }
+    },
+    {
+      "question_id": 49,
+      "question": "What are three main companies acquired by Pfizer mentioned in this 10K report?",
+      "doc_name": "PFIZER_2021_10K",
+      "gold_pages": [
+        69,
+        70
+      ],
+      "dense": {
+        "recall@5": 0.5,
+        "precision@5": 0.2,
+        "mrr": 1.0,
+        "map@5": 0.5,
+        "hit@5": 1
+      },
+      "bm25": {
+        "recall@5": 0.0,
+        "precision@5": 0.0,
+        "mrr": 0.0,
+        "map@5": 0.0,
+        "hit@5": 0
+      },
+      "hybrid": {
+        "recall@5": 0.5,
+        "precision@5": 0.2,
+        "mrr": 0.3333333333333333,
+        "map@5": 0.16666666666666666,
+        "hit@5": 1
+      }
+    }
+  ]
+}
