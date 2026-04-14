@@ -1,5 +1,5 @@
 .env, 
-data/raw/, 
+data/*, 
 qdrant_storage/,
 __pycache__/, 
 .venv/, 
