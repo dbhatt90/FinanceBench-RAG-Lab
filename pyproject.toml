@@ -13,8 +13,10 @@ dependencies = [
     "langchain-google-vertexai>=3.2.2",
     "langchain-groq>=1.1.2",
     "pdfplumber>=0.11.9",
+    "pytest>=9.0.3",
     "python-dotenv>=1.2.2",
     "qdrant-client>=1.17.1",
+    "rank-bm25>=0.2.2",
     "unstructured[pdf]>=0.22.18",
 ]
 [tool.setuptools.packages.find]

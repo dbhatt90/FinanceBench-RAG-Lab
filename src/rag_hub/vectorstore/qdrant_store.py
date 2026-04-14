@@ -4,6 +4,9 @@ from typing import List, Dict, Optional
 from qdrant_client import QdrantClient
 from qdrant_client.models import (
     Distance,
+    FieldCondition,
+    Filter,
+    MatchValue,
     VectorParams,
     PointStruct,
 )
@@ -106,3 +109,25 @@ class QdrantStore:
             limit=k,
             query_filter=query_filter,
         )
+    
+
+    def delete_by_doc_name(self, doc_name: str):
+        """
+        Deletes all vectors (and payloads) for a given document.
+        """
+
+        print(f"[INFO] Deleting all entries for doc: {doc_name}")
+
+        self.client.delete(
+            collection_name=self.collection,
+            points_selector=Filter(
+                must=[
+                    FieldCondition(
+                        key="doc_name",
+                        match=MatchValue(value=doc_name)
+                    )
+                ]
+            )
+        )
+
+        print(f"[DONE] Deleted entries for: {doc_name}")
