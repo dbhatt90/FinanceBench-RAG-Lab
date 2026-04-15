@@ -62,34 +62,35 @@ class QdrantStore:
     # -----------------------------
     # Upsert chunks + embeddings
     # -----------------------------
-    def upsert(self, chunks: List[Dict], vectors: List[List[float]]):
+    def upsert(self, chunks: List[Dict], vectors: List[List[float]], batch_size: int = 32):
         """
-        Inserts chunk embeddings into Qdrant.
+        Inserts chunk embeddings into Qdrant in batches.
 
-        Payload:
-            doc_name, page, text, chunk_idx
+        Why batched? Each chunk carries its full text in the payload.
+        A single upsert of 100+ long chunks can exceed Qdrant's 32MB
+        request limit. batch_size=32 keeps each request well under the cap.
+
+        Payload: doc_name, page, text, chunk_idx
         """
-
-        points = []
-
-        for chunk, vec in zip(chunks, vectors):
-            points.append(
-                PointStruct(
-                    id=chunk["id"],
-                    vector=vec,
-                    payload={
-                        "doc_name": chunk["doc_name"],
-                        "page": chunk["page"],
-                        "text": chunk["text"],
-                        "chunk_idx": chunk["chunk_idx"],
-                    },
-                )
+        points = [
+            PointStruct(
+                id=chunk["id"],
+                vector=vec,
+                payload={
+                    "doc_name": chunk["doc_name"],
+                    "page": chunk["page"],
+                    "text": chunk["text"],
+                    "chunk_idx": chunk["chunk_idx"],
+                },
             )
+            for chunk, vec in zip(chunks, vectors)
+        ]
 
-        self.client.upsert(
-            collection_name=self.collection,
-            points=points,
-        )
+        for i in range(0, len(points), batch_size):
+            self.client.upsert(
+                collection_name=self.collection,
+                points=points[i : i + batch_size],
+            )
 
     # -----------------------------
     # Vector search
