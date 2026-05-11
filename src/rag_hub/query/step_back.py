@@ -1,22 +1,93 @@
+import os
 from typing import List
 
+import vertexai
+from langchain_google_vertexai import ChatVertexAI
+from langchain_core.prompts import ChatPromptTemplate
+from google.oauth2 import service_account
+from dotenv import load_dotenv
+
 from rag_hub.query.base import QueryTransform
+
+load_dotenv()
+
+_credentials = service_account.Credentials.from_service_account_file(
+    os.getenv("GOOGLE_APPLICATION_CREDENTIALS"),
+    scopes=["https://www.googleapis.com/auth/cloud-platform"],
+)
+vertexai.init(
+    project=os.getenv("GCP_PROJECT_ID"),
+    location=os.getenv("GCP_LOCATION", "us-central1"),
+    credentials=_credentials,
+)
+
+STEP_BACK_PROMPT_TEMPLATE = """\
+You are analyzing a question about a company's SEC 10-K or 10-Q filing.
+
+Reformulate the specific question below into a broader, more general question that:
+- Removes specific numbers, dates, or named metrics
+- Asks about the general concept, trend, or principle behind the original question
+- Can be answered by a broader section of the filing (e.g. MD&A, Risk Factors, Business Overview)
+
+The step-back question should retrieve context that helps answer the original question.
+
+Rules:
+- Return ONLY the step-back question, nothing else.
+- If the original question is already broad (e.g. "What are the main risks?"), return it unchanged.
+
+Original question: {question}
+
+Step-back question:"""
 
 
 class StepBackTransform(QueryTransform):
     """
-    Step-back prompting (stub — not evaluated in Day 4).
+    Step-back prompting for financial 10-K/Q questions.
 
-    The technique asks an LLM to reformulate a specific question as a
-    more general one. For example:
-      "What was Apple's iPhone revenue in Q3 2022?"
-      → "What are Apple's iPhone revenue trends?"
+    Reformulates a specific question (e.g. "What was Apple's iPhone revenue
+    in Q3 2022?") into a broader one ("What are Apple's iPhone revenue trends
+    and segment reporting?") before retrieval.
 
-    This is most useful for questions that require broad background context
-    before narrowing to specifics. For FinanceBench's direct lookup questions
-    the benefit is marginal — implemented fully in a future day.
+    Why this helps:
+      - Specific questions often land in narrow chunks (a single table row).
+        The step-back question retrieves surrounding context — trends, MD&A
+        commentary, segment breakdowns — that gives the LLM richer grounding
+        to answer the original specific question.
+      - Particularly useful for "why" and "how" questions where the answer
+        lives in explanatory prose rather than a single data point.
+
+    transform() returns [step_back_question, original_question] so the caller
+    can retrieve for both and union the results.
     """
 
+    def __init__(self, model: str = "gemini-2.5-flash", verbose: bool = True):
+        self.verbose = verbose
+        self.llm = ChatVertexAI(
+            model_name=model,
+            temperature=0.0,
+            project=os.getenv("GCP_PROJECT_ID"),
+            location=os.getenv("GCP_LOCATION", "us-central1"),
+            credentials=_credentials,
+        )
+        self.prompt = ChatPromptTemplate.from_template(STEP_BACK_PROMPT_TEMPLATE)
+        self.chain = self.prompt | self.llm
+
     def transform(self, query: str) -> List[str]:
-        # stub: returns the original query unchanged
-        return [query]
+        """
+        Returns [step_back_question, original_question].
+
+        Both are retrieved; union gives broad context + specific lookup.
+        Falls back to [query] if the LLM returns empty.
+        """
+        response = self.chain.invoke({"question": query})
+        step_back = response.content.strip()
+
+        if self.verbose:
+            print(f"\n[StepBack] Original:  {query}")
+            print(f"[StepBack] Step-back: {step_back}")
+
+        if not step_back or step_back.lower() == query.lower():
+            return [query]
+
+        # Return step-back first — broader context; original is focused follow-up.
+        return [step_back, query]
