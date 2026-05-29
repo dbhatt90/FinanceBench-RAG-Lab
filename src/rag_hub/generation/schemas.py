@@ -1,3 +1,9 @@
+"""
+Shared Pydantic schemas for Day 7 generation pipeline.
+
+Citation, CitedAnswer, and Answer are the data contracts between
+CitationAwareGenerator, SelfRAGScorer, HallucinationDetector, and CorrectiveGenerator.
+"""
 from typing import List
 from pydantic import BaseModel, Field
 

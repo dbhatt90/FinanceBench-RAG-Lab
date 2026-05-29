@@ -31,7 +31,11 @@ def test_answer_confidence_bounded():
     with pytest.raises(ValidationError):
         Answer(text="x", citations=[], confidence=1.5)
     with pytest.raises(ValidationError):
+        Answer(text="x", citations=[], confidence=-0.1)
+    with pytest.raises(ValidationError):
         Answer(text="x", citations=[], hallucination_rate=-0.1)
+    with pytest.raises(ValidationError):
+        Answer(text="x", citations=[], hallucination_rate=1.5)
 
 
 def test_answer_from_cited_answer():
