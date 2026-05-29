@@ -43,6 +43,8 @@ from rag_hub.query.hyde import HyDETransform
 from rag_hub.query.decomposition import DecompositionTransform
 from rag_hub.query.step_back import StepBackTransform
 from rag_hub.generation.gemini_LLM import GeminiFlashGenerator
+from rag_hub.crag.evaluator import CRAGEvaluator
+from rag_hub.crag.web_fallback import WebFallback
 
 load_dotenv()
 
@@ -81,6 +83,12 @@ def _get(key: str):
             _singletons[key] = StepBackTransform(verbose=False)
         elif key == "generator":
             _singletons[key] = GeminiFlashGenerator()
+        elif key == "crag_evaluator":
+            _singletons[key] = CRAGEvaluator(threshold=0.5)
+        elif key == "web_fallback":
+            _singletons[key] = WebFallback()
+        # Note: "reranker" is NOT auto-initialised — injected by RetrievalPipeline
+        # so callers can choose BGE, ColBERT, or none.
     return _singletons[key]
 
 
@@ -249,17 +257,82 @@ def stepback_node(state: RouterState) -> dict:
 
 def generate_node(state: RouterState) -> dict:
     """
-    Reads state["question"] + state["docs"], writes state["answer"].
+    Reads state["question"] + state["reranked_docs"] (or state["docs"] fallback),
+    writes state["answer"].
 
-    This node is shared by all four branches — it doesn't know or care which
-    retrieval strategy was used. It just formats the docs into context and
-    calls the LLM generator.
-
-    Keeping generation separate from retrieval means we can swap the generator
-    (e.g. GPT-4 vs Gemini) without touching any retrieval node.
+    Day 6: prefers reranked_docs when present so generation uses the reranked
+    ordering. Falls back to docs for backward compatibility (e.g. reranker disabled).
     """
+    chunks = state.get("reranked_docs") or state.get("docs", [])
     answer = _get("generator").generate(
         question=state["question"],
-        chunks=state["docs"],
+        chunks=chunks,
     )
     return {"answer": answer}
+
+
+# ---------------------------------------------------------------------------
+# Node 4 — Rerank  (Day 6)
+# ---------------------------------------------------------------------------
+
+def rerank_node(state: RouterState) -> dict:
+    """
+    Reads state["docs"], writes state["reranked_docs"].
+
+    Uses whichever reranker is registered in _singletons["reranker"].
+    If none is registered (reranker disabled), passes docs through unchanged.
+    Placed after all retrieval branches converge, before crag_node.
+    """
+    reranker = _singletons.get("reranker")
+    docs = state.get("docs", [])
+
+    if reranker is None or not docs:
+        return {"reranked_docs": docs}
+
+    reranked = reranker.rerank(state["question"], docs, top_k=5)
+    reranker_type = type(reranker).__name__
+    print(f"[RerankNode] {len(docs)} → {len(reranked)} docs  reranker={reranker_type}")
+    return {"reranked_docs": reranked, "reranker_type": reranker_type}
+
+
+# ---------------------------------------------------------------------------
+# Node 5 — CRAG evaluator  (Day 6)
+# ---------------------------------------------------------------------------
+
+def crag_node(state: RouterState) -> dict:
+    """
+    Reads state["reranked_docs"], writes state["crag_confidence"] + state["crag_labels"].
+
+    Evaluates the top-3 reranked docs for relevance to the question via one
+    Gemini Flash call. Does NOT trigger fallback itself — the conditional edge
+    in graph.py reads crag_confidence and routes to web_fallback if needed.
+    """
+    evaluator = _get("crag_evaluator")
+    docs = state.get("reranked_docs") or state.get("docs", [])
+
+    if not docs:
+        return {"crag_confidence": 0.0, "crag_labels": []}
+
+    confidence, labels = evaluator.evaluate(state["question"], docs)
+    print(f"[CRAGNode] confidence={confidence:.3f}  labels={labels[:3]}")
+    return {"crag_confidence": confidence, "crag_labels": labels}
+
+
+# ---------------------------------------------------------------------------
+# Node 6 — Web fallback  (Day 6)
+# ---------------------------------------------------------------------------
+
+def web_fallback_node(state: RouterState) -> dict:
+    """
+    Reads state["question"], appends web search results to state["reranked_docs"].
+    Sets state["used_fallback"] = True.
+
+    Web results are appended after existing docs (not replacing them), so the
+    generator has both the original corpus chunks and the web snippets.
+    """
+    fallback = _get("web_fallback")
+    web_docs = fallback.search(state["question"])
+    existing = state.get("reranked_docs") or state.get("docs", [])
+    combined = existing + web_docs
+    print(f"[WebFallback] Added {len(web_docs)} web results. Total: {len(combined)} docs")
+    return {"reranked_docs": combined, "used_fallback": True}

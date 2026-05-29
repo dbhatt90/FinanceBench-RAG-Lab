@@ -1,16 +1,7 @@
 """
-LangGraph DAG for the Day 5 routing pipeline.
+LangGraph DAG for the Day 6 routing + reranking + CRAG pipeline.
 
-How LangGraph works:
-  - A StateGraph is a directed graph where nodes are Python functions and
-    edges define execution order.
-  - Every node receives the full state dict, returns a partial update,
-    and LangGraph merges the update back into state.
-  - Conditional edges read a field from state (here: "route") and branch
-    to the appropriate next node — this is what makes routing possible.
-  - START and END are special LangGraph sentinels for the entry and exit points.
-
-Graph structure (ASCII):
+Graph structure:
 
     START
       │
@@ -26,18 +17,23 @@ Graph structure (ASCII):
     └────────┴────────────┴──────────────┘
                           │
                           ▼
-                    generate_node   ← reads question + docs, writes answer
+                    rerank_node      ← Day 6: cross-encoder or ColBERT rerank
+                          │
+                          ▼
+                    crag_node        ← Day 6: LLM relevance evaluator
+                          │
+              ┌───────────┴──────────────┐
+              ▼ confidence < threshold   ▼ confidence >= threshold
+        web_fallback_node          generate_node
+              │                         │
+              └─────────────────────────┘
                           │
                           ▼
                          END
 
-Why this topology?
-  - All four retrieval branches converge to a single generate_node.
-    Generation logic is identical regardless of which branch ran —
-    keeping it DRY and making it trivial to swap the generator later.
-  - classify_node → conditional_edge → retrieval node is the key LangGraph
-    pattern: one node sets a routing key, the edge reads it, LangGraph
-    dispatches to the right branch. No if/else in the graph definition.
+Day 5 vs Day 6 change:
+  All retrieval branches now converge at rerank_node (not generate_node).
+  rerank → crag → conditional branch → [web_fallback →] generate.
 """
 
 from langgraph.graph import StateGraph, START, END
@@ -50,40 +46,36 @@ from rag_hub.routing.nodes import (
     decompose_node,
     stepback_node,
     generate_node,
+    rerank_node,
+    crag_node,
+    web_fallback_node,
 )
+
+CRAG_THRESHOLD = 0.5
 
 
 def _route_selector(state: RouterState) -> str:
-    """
-    Conditional edge function.
-
-    LangGraph calls this after classify_node completes. It reads the "route"
-    field that classify_node wrote and returns a node name. LangGraph then
-    jumps execution to that node.
-
-    This is a pure routing function — no LLM calls, no side effects.
-    """
     return state["route"]  # one of: "direct", "hyde", "decompose", "stepback"
 
 
+def _crag_selector(state: RouterState) -> str:
+    """
+    Conditional edge after crag_node.
+    Routes to web_fallback if confidence is below threshold, else generate.
+    web_fallback can be disabled by setting crag_confidence artificially high
+    (done by RetrievalPipeline when web_fallback_enabled=False).
+    """
+    confidence = state.get("crag_confidence", 1.0)
+    # used_fallback being True means we already ran fallback (shouldn't loop)
+    if not state.get("used_fallback") and confidence < CRAG_THRESHOLD:
+        return "web_fallback"
+    return "generate"
+
+
 def build_graph() -> StateGraph:
-    """
-    Constructs and compiles the routing DAG.
-
-    Returns a compiled LangGraph app. Call app.invoke({"question": "..."})
-    to run the full pipeline and get back the final state including "answer".
-
-    Why compile()?
-      compile() validates the graph (no orphan nodes, all edges reachable,
-      START/END connected) and returns a Runnable — the same interface as
-      any LangChain chain, so it works with .invoke(), .stream(), .batch().
-    """
     graph = StateGraph(RouterState)
 
-    # -----------------------------------------------------------------------
-    # Register nodes
-    # Each call gives the node a string name used in edge definitions.
-    # -----------------------------------------------------------------------
+    # Existing Day 5 nodes
     graph.add_node("classify", classify_node)
     graph.add_node("direct", direct_node)
     graph.add_node("hyde", hyde_node)
@@ -91,23 +83,15 @@ def build_graph() -> StateGraph:
     graph.add_node("stepback", stepback_node)
     graph.add_node("generate", generate_node)
 
-    # -----------------------------------------------------------------------
-    # Entry edge: START → classify
-    # Every invocation starts here.
-    # -----------------------------------------------------------------------
+    # Day 6 new nodes
+    graph.add_node("rerank", rerank_node)
+    graph.add_node("crag", crag_node)
+    graph.add_node("web_fallback", web_fallback_node)
+
+    # Entry
     graph.add_edge(START, "classify")
 
-    # -----------------------------------------------------------------------
-    # Conditional edge: classify → one of {direct, hyde, decompose, stepback}
-    #
-    # add_conditional_edges(source, path_fn, path_map):
-    #   source   — the node whose output triggers the branch
-    #   path_fn  — function that reads state and returns a string key
-    #   path_map — dict mapping that key to the next node name
-    #
-    # LangGraph calls path_fn(state) after "classify" finishes, looks up the
-    # returned key in path_map, and jumps to the mapped node.
-    # -----------------------------------------------------------------------
+    # Routing branch (unchanged from Day 5)
     graph.add_conditional_edges(
         "classify",
         _route_selector,
@@ -119,24 +103,33 @@ def build_graph() -> StateGraph:
         },
     )
 
-    # -----------------------------------------------------------------------
-    # Convergence edges: all retrieval branches → generate
-    # After whichever branch runs, execution always continues to generate.
-    # -----------------------------------------------------------------------
-    graph.add_edge("direct", "generate")
-    graph.add_edge("hyde", "generate")
-    graph.add_edge("decompose", "generate")
-    graph.add_edge("stepback", "generate")
+    # All retrieval branches converge at rerank (Day 6 change: was → generate)
+    graph.add_edge("direct", "rerank")
+    graph.add_edge("hyde", "rerank")
+    graph.add_edge("decompose", "rerank")
+    graph.add_edge("stepback", "rerank")
 
-    # -----------------------------------------------------------------------
-    # Exit edge: generate → END
-    # -----------------------------------------------------------------------
+    # rerank → crag
+    graph.add_edge("rerank", "crag")
+
+    # crag → web_fallback or generate
+    graph.add_conditional_edges(
+        "crag",
+        _crag_selector,
+        {
+            "web_fallback": "web_fallback",
+            "generate": "generate",
+        },
+    )
+
+    # web_fallback → generate
+    graph.add_edge("web_fallback", "generate")
+
+    # generate → END
     graph.add_edge("generate", END)
 
     return graph.compile()
 
 
-# Module-level compiled app — import this for one-liner usage:
-#   from rag_hub.routing.graph import rag_app
-#   result = rag_app.invoke({"question": "What was Apple's revenue?"})
+# Module-level compiled app
 rag_app = build_graph()

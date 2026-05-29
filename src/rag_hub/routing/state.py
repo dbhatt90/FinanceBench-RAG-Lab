@@ -1,22 +1,30 @@
-from typing import List, Dict, Annotated
+from typing import List, Dict, Optional
 from typing_extensions import TypedDict
 
 
-class RouterState(TypedDict):
+class RouterState(TypedDict, total=False):
     """
     Shared state that flows through every node in the LangGraph DAG.
 
-    LangGraph passes the full state dict into each node function and merges
-    the returned partial dict back. Nodes only need to read what they depend
-    on and write what they produce.
+    Day 5 fields:
+      question — original user question (immutable)
+      route    — set by classify_node; read by conditional edge
+      docs     — set by whichever retrieval node runs
+      answer   — set by generate_node; final output
 
-    Fields:
-      question — the original user question (set at graph invocation, never mutated)
-      route    — set by classify_node; read by the conditional edge to branch
-      docs     — set by whichever retrieval node runs; read by generate_node
-      answer   — set by generate_node; the final output
+    Day 6 additions:
+      reranked_docs    — set by rerank_node; generate_node prefers this over docs
+      crag_confidence  — set by crag_node; float in [0, 1]
+      crag_labels      — per-doc relevance labels from CRAG evaluator
+      used_fallback    — True if web_fallback_node fired
+      reranker_type    — class name of reranker used (for eval logging)
     """
     question: str
     route: str
     docs: List[Dict]
     answer: str
+    reranked_docs: List[Dict]
+    crag_confidence: float
+    crag_labels: List[str]
+    used_fallback: bool
+    reranker_type: str

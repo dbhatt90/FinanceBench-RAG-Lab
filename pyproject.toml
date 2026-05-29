@@ -22,6 +22,9 @@ dependencies = [
     "scikit-learn>=1.8.0",
     "umap-learn>=0.5.12",
     "unstructured[pdf]>=0.22.18",
+    "transformers>=4.40.0",
+    "torch>=2.1.0",
+    "duckduckgo-search>=6.0.0",
 ]
 [tool.setuptools.packages.find]
 where = ["src"]
