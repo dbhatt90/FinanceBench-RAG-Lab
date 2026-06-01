@@ -1,9 +1,10 @@
 """
-Generation quality metrics: ROUGE, BERTScore, RAGAS.
+Generation quality metrics: ROUGE, BERTScore, RAGAS, Exact Match, Numeric Match.
 ROUGE runs locally (no API). BERTScore downloads model on first call (~1.5 GB).
 RAGAS requires LLM API — call sparingly.
 """
-from typing import Dict, List
+import re
+from typing import Dict, List, Optional
 
 from rouge_score import rouge_scorer
 
@@ -30,6 +31,28 @@ class GenerationMetrics:
             self._bert_scorer = BERTScorer(lang="en", rescale_with_baseline=True)
         P, R, F1 = self._bert_scorer.score([prediction], [reference])
         return round(float(F1[0]), 4)
+
+    def exact_match(self, prediction: str, reference: str) -> bool:
+        """True if the gold answer string appears anywhere in the prediction (case-insensitive)."""
+        return reference.strip().lower() in prediction.strip().lower()
+
+    def numeric_match(self, prediction: str, reference: str, tolerance: float = 0.01) -> Optional[bool]:
+        """
+        Extracts the first number from both strings and checks if they agree within
+        `tolerance` (default 1%). Returns None if either string has no parseable number.
+        """
+        def extract(s: str) -> Optional[float]:
+            s = s.replace(",", "").replace("%", "").replace("$", "")
+            m = re.search(r"-?\d+(?:\.\d+)?", s)
+            return float(m.group()) if m else None
+
+        pred_val = extract(prediction)
+        ref_val = extract(reference)
+        if pred_val is None or ref_val is None:
+            return None
+        if ref_val == 0:
+            return abs(pred_val) <= tolerance
+        return abs(pred_val - ref_val) / abs(ref_val) <= tolerance
 
     def ragas_metrics(
         self,
