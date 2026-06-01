@@ -5,13 +5,18 @@ Citation, CitedAnswer, and Answer are the data contracts between
 CitationAwareGenerator, SelfRAGScorer, HallucinationDetector, and CorrectiveGenerator.
 """
 from typing import List
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 class Citation(BaseModel):
     doc_id: str = Field(..., description="doc_name from the chunk payload")
     page: int = Field(..., description="0-indexed page number")
-    quote: str = Field(..., max_length=200, description="Verbatim excerpt from the source")
+    quote: str = Field(..., description="Verbatim excerpt from the source")
+
+    @field_validator("quote")
+    @classmethod
+    def truncate_quote(cls, v: str) -> str:
+        return v[:500]
 
 
 class CitedAnswer(BaseModel):

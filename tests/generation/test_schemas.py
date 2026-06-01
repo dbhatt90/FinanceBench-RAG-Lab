@@ -10,9 +10,11 @@ def test_citation_requires_doc_id_page_quote():
     assert c.quote == "Revenue was $394B"
 
 
-def test_citation_quote_max_200_chars():
-    with pytest.raises(ValidationError):
-        Citation(doc_id="X", page=1, quote="A" * 201)
+def test_citation_quote_truncated_to_500_chars():
+    # Quotes longer than 500 chars are silently truncated rather than rejected,
+    # so the LLM returning a long quote never breaks structured output parsing.
+    c = Citation(doc_id="X", page=1, quote="A" * 600)
+    assert len(c.quote) == 500
 
 
 def test_cited_answer_defaults_empty_citations():
