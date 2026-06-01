@@ -24,14 +24,13 @@ class GenerationMetrics:
         }
 
     def bert_score(self, prediction: str, reference: str) -> float:
-        """BERTScore F1. Loads model on first call (~1.5 GB)."""
-        from bert_score import score as _bert_score
-        P, R, F1 = _bert_score(
-            [prediction], [reference],
-            lang="en",
-            rescale_with_baseline=True,
-            verbose=False,
-        )
+        """BERTScore F1. Model is loaded once and cached on first call."""
+        if not hasattr(self, "_bert_scorer"):
+            from bert_score import BERTScorer
+            self._bert_scorer = BERTScorer(
+                lang="en", rescale_with_baseline=True, verbose=False
+            )
+        P, R, F1 = self._bert_scorer.score([prediction], [reference])
         return round(float(F1[0]), 4)
 
     def ragas_metrics(
