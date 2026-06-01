@@ -27,9 +27,7 @@ class GenerationMetrics:
         """BERTScore F1. Model is loaded once and cached on first call."""
         if not hasattr(self, "_bert_scorer"):
             from bert_score import BERTScorer
-            self._bert_scorer = BERTScorer(
-                lang="en", rescale_with_baseline=True, verbose=False
-            )
+            self._bert_scorer = BERTScorer(lang="en", rescale_with_baseline=True)
         P, R, F1 = self._bert_scorer.score([prediction], [reference])
         return round(float(F1[0]), 4)
 
