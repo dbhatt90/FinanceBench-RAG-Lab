@@ -27,6 +27,7 @@ dependencies = [
     "duckduckgo-search>=6.0.0",
     "rouge-score>=0.1.2",
     "bert-score>=0.3.13",
+    "datasets>=4.8.5",
 ]
 [tool.setuptools.packages.find]
 where = ["src"]
