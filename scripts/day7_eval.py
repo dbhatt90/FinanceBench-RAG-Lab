@@ -30,13 +30,9 @@ RESULTS_DIR = "eval_results"
 QDRANT_URL = os.getenv("QDRANT_URL", "http://localhost:6333")
 COLLECTION = "financebench_v1"
 BM25_PATH = "data/processed/bm25_index.pkl"
-RAGAS_LIMIT = 10
-
-
 def parse_args():
     p = argparse.ArgumentParser()
     p.add_argument("--limit", type=int, default=50)
-    p.add_argument("--no-ragas", action="store_true")
     p.add_argument("--no-bert", action="store_true")
     return p.parse_args()
 
@@ -63,8 +59,6 @@ def run_eval(questions, pipeline, metrics, args):
             "num_citations": len(answer.citations),
             **rouge,
             "bert_score": None,
-            "ragas_faithfulness": None,
-            "ragas_answer_relevancy": None,
         }
 
         if not args.no_bert and reference and prediction.lower() != "i don't know":
@@ -72,15 +66,6 @@ def run_eval(questions, pipeline, metrics, args):
                 row["bert_score"] = metrics.bert_score(prediction, reference)
             except Exception as e:
                 print(f"  [WARN] BERTScore failed: {e}")
-
-        if not args.no_ragas and i < RAGAS_LIMIT and reference:
-            contexts = [d.get("text", "") for d in result["docs"][:5]]
-            try:
-                ragas = metrics.ragas_metrics(q["question"], prediction, contexts, reference)
-                row["ragas_faithfulness"] = ragas["faithfulness"]
-                row["ragas_answer_relevancy"] = ragas["answer_relevancy"]
-            except Exception as e:
-                print(f"  [WARN] RAGAS failed: {e}")
 
         rows.append(row)
     return rows
@@ -115,8 +100,6 @@ def write_results(rows):
         f"| Hallucination Rate | {avg([r['hallucination_rate'] for r in rows])} | NLI-based, see note below |",
         f"| ROUGE-L | {avg([r['rougeL'] for r in rows])} | Low due to verbose vs. short gold |",
         f"| BERTScore F1 | {avg([r['bert_score'] for r in rows])} | Semantic similarity to gold |",
-        f"| RAGAS Faithfulness (n≤{RAGAS_LIMIT}) | {avg([r['ragas_faithfulness'] for r in rows])} | |",
-        f"| RAGAS Answer Relevancy (n≤{RAGAS_LIMIT}) | {avg([r['ragas_answer_relevancy'] for r in rows])} | |",
         "\n> **Note on Hallucination Rate:** NLI checks sentence entailment against cited quotes.",
         "> High rate on FinanceBench is expected — numeric reasoning sentences (\"average is 10.3%\")",
         "> are not syntactically entailed by table excerpts even when the answer is correct.",
