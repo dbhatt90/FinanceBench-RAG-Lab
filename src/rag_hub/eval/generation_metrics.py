@@ -61,10 +61,50 @@ class GenerationMetrics:
         contexts: List[str],
         ground_truth: str,
     ) -> Dict[str, float]:
-        """Faithfulness + answer_relevancy + answer_correctness via RAGAS. LLM-backed."""
+        """
+        Faithfulness + answer_relevancy + answer_correctness via RAGAS.
+        Uses Vertex AI (Gemini) as the judge LLM — no OpenAI key required.
+        Call sparingly: 3 LLM calls per question against free-tier quota.
+        """
+        import os
+        import vertexai
         from datasets import Dataset
+        from google.oauth2 import service_account
+        from langchain_google_vertexai import ChatVertexAI, VertexAIEmbeddings
         from ragas import evaluate
+        from ragas.llms import LangchainLLMWrapper
+        from ragas.embeddings import LangchainEmbeddingsWrapper
         from ragas.metrics import faithfulness, answer_relevancy, answer_correctness
+
+        # Reuse the same Vertex AI credentials as the rest of the project
+        credentials = service_account.Credentials.from_service_account_file(
+            os.getenv("GOOGLE_APPLICATION_CREDENTIALS"),
+            scopes=["https://www.googleapis.com/auth/cloud-platform"],
+        )
+        vertexai.init(
+            project=os.getenv("GCP_PROJECT_ID"),
+            location=os.getenv("GCP_LOCATION", "us-central1"),
+            credentials=credentials,
+        )
+
+        ragas_llm = LangchainLLMWrapper(ChatVertexAI(
+            model_name="gemini-2.5-flash",
+            temperature=0,
+            project=os.getenv("GCP_PROJECT_ID"),
+            location=os.getenv("GCP_LOCATION", "us-central1"),
+            credentials=credentials,
+        ))
+        ragas_emb = LangchainEmbeddingsWrapper(VertexAIEmbeddings(
+            model_name="text-embedding-004",
+            project=os.getenv("GCP_PROJECT_ID"),
+            location=os.getenv("GCP_LOCATION", "us-central1"),
+            credentials=credentials,
+        ))
+
+        # Inject Vertex AI LLM/embeddings into each metric
+        for metric in (faithfulness, answer_relevancy, answer_correctness):
+            metric.llm = ragas_llm
+        answer_relevancy.embeddings = ragas_emb
 
         dataset = Dataset.from_dict({
             "question": [question],
