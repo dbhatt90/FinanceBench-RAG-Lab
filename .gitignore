@@ -5,6 +5,7 @@ __pycache__/,
 .venv/, 
 *.ipynb_checkpoints
 *.pyc
+.claude
 
 RAG_14_Day_Mastery_Plan.md
 RAG_14_Day_Curated_Plan.md
@@ -14,7 +15,7 @@ qdrant_storage/
 src/rag.egg-info
 
 *.json
-!eval_results/day1_smoke.json
-!eval_results/day2_smoke_50.json
+!eval_results/day1/smoke.json
+!eval_results/day2/chunking_sweep.json
 *.DS_Store
 .env
