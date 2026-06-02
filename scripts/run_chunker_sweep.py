@@ -36,8 +36,10 @@ from rag_hub.eval.retrieval_metrics import recall_at_k, precision_at_k, mrr, map
 
 
 # ── Config ───────────────────────────────────────────────────────────────────
-EVAL_SET   = "data/eval/smoke_20.jsonl"
-OUTPUT_DIR = "eval_results"
+from rag_hub.config.settings import SMOKE_20_PATH, RESULTS_DIR, QDRANT_URL
+
+EVAL_SET   = str(SMOKE_20_PATH)
+OUTPUT_DIR = str(RESULTS_DIR / "day2")
 K          = 10      # NDCG@10 as primary metric
 
 
@@ -133,7 +135,7 @@ def eval_strategy(
 ) -> Dict:
     """Run retrieval eval for one strategy. Returns per-question rows + summary."""
     coll  = collection_name(name)
-    store = QdrantStore(collection=coll)
+    store = QdrantStore(url=QDRANT_URL, collection=coll)
 
     # Build BM25 + hybrid on top of this collection's corpus
     print(f"  Building BM25 index from '{coll}' …")
@@ -243,7 +245,7 @@ def print_comparison_table(all_results: Dict):
 def save_results(all_results: Dict):
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     ts   = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
-    path = os.path.join(OUTPUT_DIR, f"day3_chunker_sweep_{ts}.json")
+    path = os.path.join(OUTPUT_DIR, f"chunking_sweep_{ts}.json")
 
     output = {
         "timestamp":    datetime.utcnow().isoformat(),
