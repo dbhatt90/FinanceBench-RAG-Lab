@@ -1,25 +1,15 @@
-import os
 from typing import List
 
-import vertexai
 from langchain_google_vertexai import ChatVertexAI
 from langchain_core.prompts import ChatPromptTemplate
-from google.oauth2 import service_account
 from dotenv import load_dotenv
 
+from rag_hub.config.settings import GEMINI_LLM_MODEL, GCP_PROJECT_ID, GCP_LOCATION
+from rag_hub.config.vertex_ai import init_vertex_ai
 from rag_hub.query.base import QueryTransform
 
 load_dotenv()
-
-_credentials = service_account.Credentials.from_service_account_file(
-    os.getenv("GOOGLE_APPLICATION_CREDENTIALS"),
-    scopes=["https://www.googleapis.com/auth/cloud-platform"],
-)
-vertexai.init(
-    project=os.getenv("GCP_PROJECT_ID"),
-    location=os.getenv("GCP_LOCATION", "us-central1"),
-    credentials=_credentials,
-)
+init_vertex_ai()
 
 # This is the prompt the LLM receives. Logged at transform() time so callers
 # can inspect what the model is asked to produce.
@@ -56,7 +46,7 @@ class HyDETransform(QueryTransform):
     The caller should embed it with RETRIEVAL_DOCUMENT task type (not RETRIEVAL_QUERY).
     """
 
-    def __init__(self, model: str = "gemini-2.5-flash", verbose: bool = True):
+    def __init__(self, model: str = GEMINI_LLM_MODEL, verbose: bool = True):
         """
         Args:
             model:   Vertex AI model name for generation.
@@ -66,9 +56,8 @@ class HyDETransform(QueryTransform):
         self.llm = ChatVertexAI(
             model_name=model,
             temperature=0.3,   # slight creativity — we want plausible prose
-            project=os.getenv("GCP_PROJECT_ID"),
-            location=os.getenv("GCP_LOCATION", "us-central1"),
-            credentials=_credentials,
+            project=GCP_PROJECT_ID,
+            location=GCP_LOCATION,
         )
         self.prompt = ChatPromptTemplate.from_template(HYDE_PROMPT_TEMPLATE)
         self.chain = self.prompt | self.llm

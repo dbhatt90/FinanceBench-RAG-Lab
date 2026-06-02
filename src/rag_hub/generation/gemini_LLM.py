@@ -1,24 +1,14 @@
 from typing import List, Dict
-import os
 
-import vertexai
 from langchain_google_vertexai import ChatVertexAI
 from langchain_core.prompts import ChatPromptTemplate
-from google.oauth2 import service_account
 from dotenv import load_dotenv
 
-load_dotenv()
+from rag_hub.config.settings import GEMINI_LLM_MODEL, GCP_PROJECT_ID, GCP_LOCATION
+from rag_hub.config.vertex_ai import init_vertex_ai
 
-# Initialise Vertex AI once at import time (same pattern as embeddings)
-_credentials = service_account.Credentials.from_service_account_file(
-    os.getenv("GOOGLE_APPLICATION_CREDENTIALS"),
-    scopes=["https://www.googleapis.com/auth/cloud-platform"],
-)
-vertexai.init(
-    project=os.getenv("GCP_PROJECT_ID"),
-    location=os.getenv("GCP_LOCATION", "us-central1"),
-    credentials=_credentials,
-)
+load_dotenv()
+init_vertex_ai()
 
 
 class GeminiFlashGenerator:
@@ -37,13 +27,12 @@ class GeminiFlashGenerator:
     Designed for FinanceBench: short factual answers — numbers, phrases, 1 sentence.
     """
 
-    def __init__(self, model: str = "gemini-2.5-flash"):
+    def __init__(self, model: str = GEMINI_LLM_MODEL):
         self.llm = ChatVertexAI(
             model_name=model,
             temperature=0,
-            project=os.getenv("GCP_PROJECT_ID"),
-            location=os.getenv("GCP_LOCATION", "us-central1"),
-            credentials=_credentials,
+            project=GCP_PROJECT_ID,
+            location=GCP_LOCATION,
         )
 
         self.prompt = ChatPromptTemplate.from_template(

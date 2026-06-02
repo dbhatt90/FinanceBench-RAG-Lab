@@ -1,25 +1,15 @@
-import os
 from typing import List, Dict
 
-import vertexai
 from langchain_google_vertexai import ChatVertexAI
 from langchain_core.prompts import ChatPromptTemplate
-from google.oauth2 import service_account
 from dotenv import load_dotenv
 
+from rag_hub.config.settings import GEMINI_LLM_MODEL, GCP_PROJECT_ID, GCP_LOCATION
+from rag_hub.config.vertex_ai import init_vertex_ai
 from rag_hub.generation.schemas import Answer, CitedAnswer
 
 load_dotenv()
-
-_credentials = service_account.Credentials.from_service_account_file(
-    os.getenv("GOOGLE_APPLICATION_CREDENTIALS"),
-    scopes=["https://www.googleapis.com/auth/cloud-platform"],
-)
-vertexai.init(
-    project=os.getenv("GCP_PROJECT_ID"),
-    location=os.getenv("GCP_LOCATION", "us-central1"),
-    credentials=_credentials,
-)
+init_vertex_ai()
 
 _PROMPT = ChatPromptTemplate.from_template(
     """You are a financial analyst answering questions from SEC filings.
@@ -46,13 +36,12 @@ class CitationAwareGenerator:
     Falls back to plain text generation if structured output fails.
     """
 
-    def __init__(self, model: str = "gemini-2.5-flash"):
+    def __init__(self, model: str = GEMINI_LLM_MODEL):
         base_llm = ChatVertexAI(
             model_name=model,
             temperature=0,
-            project=os.getenv("GCP_PROJECT_ID"),
-            location=os.getenv("GCP_LOCATION", "us-central1"),
-            credentials=_credentials,
+            project=GCP_PROJECT_ID,
+            location=GCP_LOCATION,
         )
         self._chain = _PROMPT | base_llm.with_structured_output(CitedAnswer)
         self._fallback_chain = _PROMPT | base_llm

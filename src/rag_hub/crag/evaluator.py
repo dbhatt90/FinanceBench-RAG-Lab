@@ -9,26 +9,17 @@ Confidence = weighted mean of top eval_top_n docs.
 Threshold: confidence >= threshold → sufficient; < threshold → trigger fallback.
 """
 
-import os
 import re
 from typing import List, Dict, Tuple
 
-import vertexai
 from langchain_google_vertexai import ChatVertexAI
-from google.oauth2 import service_account
 from dotenv import load_dotenv
 
-load_dotenv()
+from rag_hub.config.settings import GEMINI_LLM_MODEL, GCP_PROJECT_ID, GCP_LOCATION, CRAG_CONFIDENCE_THRESHOLD
+from rag_hub.config.vertex_ai import init_vertex_ai
 
-_credentials = service_account.Credentials.from_service_account_file(
-    os.getenv("GOOGLE_APPLICATION_CREDENTIALS"),
-    scopes=["https://www.googleapis.com/auth/cloud-platform"],
-)
-vertexai.init(
-    project=os.getenv("GCP_PROJECT_ID"),
-    location=os.getenv("GCP_LOCATION", "us-central1"),
-    credentials=_credentials,
-)
+load_dotenv()
+init_vertex_ai()
 
 _LABEL_WEIGHTS = {"relevant": 1.0, "partially_relevant": 0.5, "irrelevant": 0.0}
 
@@ -57,18 +48,17 @@ Your labels:"""
 class CRAGEvaluator:
     def __init__(
         self,
-        threshold: float = 0.5,
+        threshold: float = CRAG_CONFIDENCE_THRESHOLD,
         eval_top_n: int = 3,
-        model: str = "gemini-2.5-flash",
+        model: str = GEMINI_LLM_MODEL,
     ):
         self.threshold = threshold
         self.eval_top_n = eval_top_n
         self.llm = ChatVertexAI(
             model_name=model,
             temperature=0,
-            project=os.getenv("GCP_PROJECT_ID"),
-            location=os.getenv("GCP_LOCATION", "us-central1"),
-            credentials=_credentials,
+            project=GCP_PROJECT_ID,
+            location=GCP_LOCATION,
         )
 
     def evaluate(self, question: str, docs: List[Dict]) -> Tuple[float, List[str]]:

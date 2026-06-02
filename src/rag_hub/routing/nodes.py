@@ -28,13 +28,12 @@ All retrieval nodes share the same interface so generate_node only needs
 to read state["docs"] — it doesn't care which branch produced them.
 """
 
-import os
 from typing import List, Dict
 
-import vertexai
-from google.oauth2 import service_account
 from dotenv import load_dotenv
 
+from rag_hub.config.settings import COLLECTION_NAME, QDRANT_URL, CRAG_CONFIDENCE_THRESHOLD
+from rag_hub.config.vertex_ai import init_vertex_ai
 from rag_hub.routing.router import QuestionRouter
 from rag_hub.routing.state import RouterState
 from rag_hub.embeddings.gemini_001 import GeminiEmbeddingClient
@@ -47,16 +46,7 @@ from rag_hub.crag.evaluator import CRAGEvaluator
 from rag_hub.crag.web_fallback import WebFallback
 
 load_dotenv()
-
-_credentials = service_account.Credentials.from_service_account_file(
-    os.getenv("GOOGLE_APPLICATION_CREDENTIALS"),
-    scopes=["https://www.googleapis.com/auth/cloud-platform"],
-)
-vertexai.init(
-    project=os.getenv("GCP_PROJECT_ID"),
-    location=os.getenv("GCP_LOCATION", "us-central1"),
-    credentials=_credentials,
-)
+init_vertex_ai()
 
 # ---------------------------------------------------------------------------
 # Lazy singletons — initialised on first node call, reused thereafter.
@@ -72,7 +62,7 @@ def _get(key: str):
         if key == "embedder":
             _singletons[key] = GeminiEmbeddingClient()
         elif key == "store":
-            _singletons[key] = QdrantStore(collection="financebench_v1")
+            _singletons[key] = QdrantStore(url=QDRANT_URL, collection=COLLECTION_NAME)
         elif key == "router":
             _singletons[key] = QuestionRouter(verbose=True)
         elif key == "hyde":
@@ -84,7 +74,7 @@ def _get(key: str):
         elif key == "generator":
             _singletons[key] = GeminiFlashGenerator()
         elif key == "crag_evaluator":
-            _singletons[key] = CRAGEvaluator(threshold=0.5)
+            _singletons[key] = CRAGEvaluator(threshold=CRAG_CONFIDENCE_THRESHOLD)
         elif key == "web_fallback":
             _singletons[key] = WebFallback()
         # Note: "reranker" is NOT auto-initialised — injected by RetrievalPipeline

@@ -24,15 +24,14 @@ from typing import Callable, List, Dict, Optional
 
 from tqdm import tqdm
 
+from rag_hub.config.settings import (
+    PDF_DIR as _DEFAULT_PDF_DIR,
+    PAGES_CACHE_DIR as _DEFAULT_PAGES_CACHE_DIR,
+    CHECKPOINTS_DIR as _DEFAULT_CHECKPOINTS_DIR,
+)
 from rag_hub.loaders.pdf_loader import load_pdf, load_cached_pages, save_cached_pages
 from rag_hub.embeddings.gemini_001 import GeminiEmbeddingClient
 from rag_hub.vectorstore.qdrant_store import QdrantStore
-
-
-# ── defaults ────────────────────────────────────────────────────────────────
-PDF_DIR = "data/raw/financebench/pdfs"
-PAGES_CACHE_DIR = "data/processed/pages"
-CHECKPOINTS_DIR = "data/eval/checkpoints"
 
 
 class IndexBuilder:
@@ -59,8 +58,8 @@ class IndexBuilder:
         self,
         collection_name: str,
         eval_set_path: str,
-        pdf_dir: str = PDF_DIR,
-        pages_cache_dir: str = PAGES_CACHE_DIR,
+        pdf_dir: str = str(_DEFAULT_PDF_DIR),
+        pages_cache_dir: str = str(_DEFAULT_PAGES_CACHE_DIR),
         embed_dim: int = 768,
         batch_size: int = 100,
     ):
@@ -72,7 +71,7 @@ class IndexBuilder:
         self.batch_size = batch_size
 
         # per-collection checkpoint so parallel runs don't collide
-        self.checkpoint_path = Path(CHECKPOINTS_DIR) / f"{collection_name}.json"
+        self.checkpoint_path = _DEFAULT_CHECKPOINTS_DIR / f"{collection_name}.json"
 
     # ── public API ────────────────────────────────────────────────────────────
 

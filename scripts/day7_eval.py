@@ -9,7 +9,7 @@ Metrics per question:
   rouge_l          — lexical overlap with gold
   bert_score       — semantic similarity to gold (optional, slow first load)
 
-Writes: eval_results/day_07_results.md + eval_results/day_07_raw.json
+Writes: eval_results/day7/results.md + eval_results/day7/raw.json
 """
 import sys, os, json, argparse
 from datetime import datetime
@@ -18,6 +18,7 @@ from statistics import mean
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
+from rag_hub.config.settings import SMOKE_50_PATH, QDRANT_URL, COLLECTION_NAME, BM25_INDEX_PATH, RESULTS_DIR
 from rag_hub.eval.financebench import load_questions
 from rag_hub.eval.generation_metrics import GenerationMetrics
 from rag_hub.embeddings.gemini_001 import GeminiEmbeddingClient
@@ -25,11 +26,9 @@ from rag_hub.vectorstore.qdrant_store import QdrantStore
 from rag_hub.retrievers.bm25_retriever import BM25Retriever
 from rag_hub.generation.day7_pipeline import Day7Pipeline
 
-SMOKE_PATH = "data/eval/smoke_50.jsonl"
-RESULTS_DIR = "eval_results"
-QDRANT_URL = os.getenv("QDRANT_URL", "http://localhost:6333")
-COLLECTION = "financebench_v1"
-BM25_PATH = "data/processed/bm25_index.pkl"
+SMOKE_PATH = str(SMOKE_50_PATH)
+COLLECTION = COLLECTION_NAME
+BM25_PATH = str(BM25_INDEX_PATH)
 def parse_args():
     p = argparse.ArgumentParser()
     p.add_argument("--limit", type=int, default=50)
@@ -72,7 +71,8 @@ def run_eval(questions, pipeline, metrics, args):
 
 
 def write_results(rows):
-    os.makedirs(RESULTS_DIR, exist_ok=True)
+    day7_dir = RESULTS_DIR / "day7"
+    day7_dir.mkdir(parents=True, exist_ok=True)
 
     def avg(vals):
         v = [x for x in vals if x is not None]
@@ -120,11 +120,11 @@ def write_results(rows):
             f"| {em} | {nm} | {r['confidence']} | {r['hallucination_rate']} | {r['rougeL']} |"
         )
 
-    path = os.path.join(RESULTS_DIR, "day_07_results.md")
+    path = day7_dir / "results.md"
     with open(path, "w") as f:
         f.write("\n".join(md))
 
-    json_path = os.path.join(RESULTS_DIR, "day_07_raw.json")
+    json_path = day7_dir / "raw.json"
     with open(json_path, "w") as f:
         json.dump(rows, f, indent=2)
 
