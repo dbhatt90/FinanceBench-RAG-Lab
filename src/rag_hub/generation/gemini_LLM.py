@@ -4,7 +4,7 @@ from langchain_google_vertexai import ChatVertexAI
 from langchain_core.prompts import ChatPromptTemplate
 from dotenv import load_dotenv
 
-from rag_hub.config.settings import GEMINI_LLM_MODEL, GCP_PROJECT_ID, GCP_LOCATION
+from rag_hub.config.settings import GEMINI_LLM_MODEL
 from rag_hub.config.vertex_ai import init_vertex_ai
 
 load_dotenv()
@@ -31,8 +31,6 @@ class GeminiFlashGenerator:
         self.llm = ChatVertexAI(
             model_name=model,
             temperature=0,
-            project=GCP_PROJECT_ID,
-            location=GCP_LOCATION,
         )
 
         self.prompt = ChatPromptTemplate.from_template(

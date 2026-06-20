@@ -15,7 +15,7 @@ from typing import List, Dict, Tuple
 from langchain_google_vertexai import ChatVertexAI
 from dotenv import load_dotenv
 
-from rag_hub.config.settings import GEMINI_LLM_MODEL, GCP_PROJECT_ID, GCP_LOCATION, CRAG_CONFIDENCE_THRESHOLD
+from rag_hub.config.settings import GEMINI_LLM_MODEL, CRAG_CONFIDENCE_THRESHOLD
 from rag_hub.config.vertex_ai import init_vertex_ai
 
 load_dotenv()
@@ -57,8 +57,6 @@ class CRAGEvaluator:
         self.llm = ChatVertexAI(
             model_name=model,
             temperature=0,
-            project=GCP_PROJECT_ID,
-            location=GCP_LOCATION,
         )
 
     def evaluate(self, question: str, docs: List[Dict]) -> Tuple[float, List[str]]:

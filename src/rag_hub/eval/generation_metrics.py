@@ -66,39 +66,23 @@ class GenerationMetrics:
         Uses Vertex AI (Gemini) as the judge LLM — no OpenAI key required.
         Call sparingly: 3 LLM calls per question against free-tier quota.
         """
-        import os
-        import vertexai
         from datasets import Dataset
-        from google.oauth2 import service_account
         from langchain_google_vertexai import ChatVertexAI, VertexAIEmbeddings
         from ragas import evaluate
         from ragas.llms import LangchainLLMWrapper
         from ragas.embeddings import LangchainEmbeddingsWrapper
         from ragas.metrics import faithfulness, answer_relevancy, answer_correctness
+        from rag_hub.config.settings import GEMINI_LLM_MODEL
+        from rag_hub.config.vertex_ai import init_vertex_ai
 
-        # Reuse the same Vertex AI credentials as the rest of the project
-        credentials = service_account.Credentials.from_service_account_file(
-            os.getenv("GOOGLE_APPLICATION_CREDENTIALS"),
-            scopes=["https://www.googleapis.com/auth/cloud-platform"],
-        )
-        vertexai.init(
-            project=os.getenv("GCP_PROJECT_ID"),
-            location=os.getenv("GCP_LOCATION", "us-central1"),
-            credentials=credentials,
-        )
+        init_vertex_ai()
 
         ragas_llm = LangchainLLMWrapper(ChatVertexAI(
-            model_name="gemini-2.5-flash",
+            model_name=GEMINI_LLM_MODEL,
             temperature=0,
-            project=os.getenv("GCP_PROJECT_ID"),
-            location=os.getenv("GCP_LOCATION", "us-central1"),
-            credentials=credentials,
         ))
         ragas_emb = LangchainEmbeddingsWrapper(VertexAIEmbeddings(
             model_name="text-embedding-004",
-            project=os.getenv("GCP_PROJECT_ID"),
-            location=os.getenv("GCP_LOCATION", "us-central1"),
-            credentials=credentials,
         ))
 
         # Inject Vertex AI LLM/embeddings into each metric
