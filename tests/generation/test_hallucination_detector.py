@@ -16,8 +16,13 @@ def test_split_sentences_filters_short():
 def _make_detector(label: str) -> HallucinationDetector:
     d = HallucinationDetector.__new__(HallucinationDetector)
     d.threshold = 0.25
+    d.batch_size = 16
+    # check() now batches all sentence pairs in one call → one candidate-list per input.
     d._pipe = MagicMock(
-        return_value=[[{"label": label, "score": 0.9}, {"label": "OTHER", "score": 0.1}]]
+        side_effect=lambda inputs, **kw: [
+            [{"label": label, "score": 0.9}, {"label": "OTHER", "score": 0.1}]
+            for _ in inputs
+        ]
     )
     return d
 

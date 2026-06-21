@@ -17,7 +17,7 @@ def _make_cited_answer():
 
 
 def test_generate_returns_answer_with_citations():
-    with patch("rag_hub.generation.citation_generator.ChatVertexAI") as MockLLM:
+    with patch("rag_hub.generation.citation_generator.make_chat_llm") as MockLLM:
         mock_chain_output = _make_cited_answer()
         mock_instance = MagicMock()
         mock_instance.with_structured_output.return_value.__or__ = MagicMock(

@@ -1,14 +1,12 @@
 from typing import List, Dict
 
-from langchain_google_vertexai import ChatVertexAI
 from langchain_core.prompts import ChatPromptTemplate
 from dotenv import load_dotenv
 
 from rag_hub.config.settings import GEMINI_LLM_MODEL
-from rag_hub.config.vertex_ai import init_vertex_ai
+from rag_hub.config.vertex_ai import make_chat_llm
 
 load_dotenv()
-init_vertex_ai()
 
 
 class GeminiFlashGenerator:
@@ -28,10 +26,7 @@ class GeminiFlashGenerator:
     """
 
     def __init__(self, model: str = GEMINI_LLM_MODEL):
-        self.llm = ChatVertexAI(
-            model_name=model,
-            temperature=0,
-        )
+        self.llm = make_chat_llm(model, temperature=0)
 
         self.prompt = ChatPromptTemplate.from_template(
             """You are a financial analyst answering questions from SEC filings.

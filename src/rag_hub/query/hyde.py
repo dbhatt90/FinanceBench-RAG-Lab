@@ -1,15 +1,13 @@
 from typing import List
 
-from langchain_google_vertexai import ChatVertexAI
 from langchain_core.prompts import ChatPromptTemplate
 from dotenv import load_dotenv
 
 from rag_hub.config.settings import GEMINI_LLM_MODEL
-from rag_hub.config.vertex_ai import init_vertex_ai
+from rag_hub.config.vertex_ai import make_chat_llm
 from rag_hub.query.base import QueryTransform
 
 load_dotenv()
-init_vertex_ai()
 
 # This is the prompt the LLM receives. Logged at transform() time so callers
 # can inspect what the model is asked to produce.
@@ -53,10 +51,7 @@ class HyDETransform(QueryTransform):
             verbose: If True, print the prompt and generated passage to stdout.
         """
         self.verbose = verbose
-        self.llm = ChatVertexAI(
-            model_name=model,
-            temperature=0.3,   # slight creativity — we want plausible prose
-        )
+        self.llm = make_chat_llm(model, temperature=0.3)  # slight creativity — plausible prose
         self.prompt = ChatPromptTemplate.from_template(HYDE_PROMPT_TEMPLATE)
         self.chain = self.prompt | self.llm
 

@@ -67,20 +67,14 @@ class GenerationMetrics:
         Call sparingly: 3 LLM calls per question against free-tier quota.
         """
         from datasets import Dataset
-        from langchain_google_vertexai import ChatVertexAI, VertexAIEmbeddings
+        from langchain_google_vertexai import VertexAIEmbeddings
         from ragas import evaluate
         from ragas.llms import LangchainLLMWrapper
         from ragas.embeddings import LangchainEmbeddingsWrapper
         from ragas.metrics import faithfulness, answer_relevancy, answer_correctness
-        from rag_hub.config.settings import GEMINI_LLM_MODEL
-        from rag_hub.config.vertex_ai import init_vertex_ai
+        from rag_hub.config.vertex_ai import make_chat_llm
 
-        init_vertex_ai()
-
-        ragas_llm = LangchainLLMWrapper(ChatVertexAI(
-            model_name=GEMINI_LLM_MODEL,
-            temperature=0,
-        ))
+        ragas_llm = LangchainLLMWrapper(make_chat_llm(temperature=0))
         ragas_emb = LangchainEmbeddingsWrapper(VertexAIEmbeddings(
             model_name="text-embedding-004",
         ))

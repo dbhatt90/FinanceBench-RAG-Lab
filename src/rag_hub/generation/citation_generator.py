@@ -1,15 +1,13 @@
 from typing import List, Dict
 
-from langchain_google_vertexai import ChatVertexAI
 from langchain_core.prompts import ChatPromptTemplate
 from dotenv import load_dotenv
 
 from rag_hub.config.settings import GEMINI_LLM_MODEL
-from rag_hub.config.vertex_ai import init_vertex_ai
+from rag_hub.config.vertex_ai import make_chat_llm
 from rag_hub.generation.schemas import Answer, CitedAnswer
 
 load_dotenv()
-init_vertex_ai()
 
 _PROMPT = ChatPromptTemplate.from_template(
     """You are a financial analyst answering questions from SEC filings.
@@ -37,10 +35,7 @@ class CitationAwareGenerator:
     """
 
     def __init__(self, model: str = GEMINI_LLM_MODEL):
-        base_llm = ChatVertexAI(
-            model_name=model,
-            temperature=0,
-        )
+        base_llm = make_chat_llm(model, temperature=0)
         self._chain = _PROMPT | base_llm.with_structured_output(CitedAnswer)
         self._fallback_chain = _PROMPT | base_llm
 

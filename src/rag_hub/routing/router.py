@@ -33,16 +33,14 @@ Routes:
 
 from typing import Literal
 
-from langchain_google_vertexai import ChatVertexAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from dotenv import load_dotenv
 
 from rag_hub.config.settings import GEMINI_LLM_MODEL
-from rag_hub.config.vertex_ai import init_vertex_ai
+from rag_hub.config.vertex_ai import make_chat_llm
 
 load_dotenv()
-init_vertex_ai()
 
 Route = Literal["direct", "hyde", "decompose", "stepback"]
 
@@ -161,10 +159,7 @@ class QuestionRouter:
 
     def __init__(self, model: str = GEMINI_LLM_MODEL, verbose: bool = True):
         self.verbose = verbose
-        self.llm = ChatVertexAI(
-            model_name=model,
-            temperature=0.0,
-        )
+        self.llm = make_chat_llm(model, temperature=0.0)
         self.chain = (
             ChatPromptTemplate.from_template(_CLASSIFY_PROMPT)
             | self.llm

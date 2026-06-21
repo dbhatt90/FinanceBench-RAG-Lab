@@ -11,16 +11,18 @@ from typing import List, Dict
 import torch
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
+from rag_hub.config.settings import BGE_RERANKER_MODEL, get_torch_device
+
 
 class BGEReranker:
     def __init__(
         self,
-        model_name: str = "BAAI/bge-reranker-v2-m3",
-        device: str = "cpu",
+        model_name: str = BGE_RERANKER_MODEL,
+        device: str = None,
         batch_size: int = 16,
         max_length: int = 512,
     ):
-        self.device = device
+        self.device = device or get_torch_device()
         self.batch_size = batch_size
         self.max_length = max_length
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
@@ -48,6 +50,19 @@ class BGEReranker:
         return ranked[:top_k]
 
     def _score_pairs(self, query: str, texts: List[str]) -> List[float]:
+        try:
+            return self._score_pairs_on_device(query, texts)
+        except RuntimeError as e:
+            # Some models error on MPS ("Placeholder storage has not been
+            # allocated on MPS device!"). Fall back to CPU once, permanently.
+            if self.device != "cpu":
+                print(f"[BGEReranker] {self.device} failed ({e}); falling back to CPU")
+                self.device = "cpu"
+                self.model.to("cpu")
+                return self._score_pairs_on_device(query, texts)
+            raise
+
+    def _score_pairs_on_device(self, query: str, texts: List[str]) -> List[float]:
         all_scores: List[float] = []
 
         for i in range(0, len(texts), self.batch_size):

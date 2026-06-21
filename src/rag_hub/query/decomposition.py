@@ -1,15 +1,13 @@
 from typing import List
 
-from langchain_google_vertexai import ChatVertexAI
 from langchain_core.prompts import ChatPromptTemplate
 from dotenv import load_dotenv
 
 from rag_hub.config.settings import GEMINI_LLM_MODEL
-from rag_hub.config.vertex_ai import init_vertex_ai
+from rag_hub.config.vertex_ai import make_chat_llm
 from rag_hub.query.base import QueryTransform
 
 load_dotenv()
-init_vertex_ai()
 
 DECOMPOSITION_PROMPT_TEMPLATE = """\
 You are analyzing a question about a company's SEC 10-K & 10Q filings.
@@ -51,10 +49,7 @@ class DecompositionTransform(QueryTransform):
 
     def __init__(self, model: str = GEMINI_LLM_MODEL, verbose: bool = True):
         self.verbose = verbose
-        self.llm = ChatVertexAI(
-            model_name=model,
-            temperature=0.0,   # deterministic decomposition
-        )
+        self.llm = make_chat_llm(model, temperature=0.0)  # deterministic decomposition
         self.prompt = ChatPromptTemplate.from_template(DECOMPOSITION_PROMPT_TEMPLATE)
         self.chain = self.prompt | self.llm
 

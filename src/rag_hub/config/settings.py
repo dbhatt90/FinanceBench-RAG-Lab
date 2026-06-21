@@ -36,3 +36,23 @@ GCP_LOCATION: str = os.getenv("GCP_LOCATION", "us-central1")
 HALLUCINATION_THRESHOLD: float = 0.25
 CRAG_CONFIDENCE_THRESHOLD: float = 0.5
 MAX_GENERATION_ITERATIONS: int = 2
+
+
+def get_torch_device() -> str:
+    """Best available torch device: CUDA > MPS (Apple Silicon) > CPU.
+
+    Honors the TORCH_DEVICE env var if set (e.g. "cpu" to force CPU when an op
+    is unsupported on MPS).
+    """
+    forced = os.getenv("TORCH_DEVICE")
+    if forced:
+        return forced
+    try:
+        import torch
+        if torch.cuda.is_available():
+            return "cuda"
+        if torch.backends.mps.is_available():
+            return "mps"
+    except Exception:
+        pass
+    return "cpu"

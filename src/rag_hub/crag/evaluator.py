@@ -12,14 +12,12 @@ Threshold: confidence >= threshold → sufficient; < threshold → trigger fallb
 import re
 from typing import List, Dict, Tuple
 
-from langchain_google_vertexai import ChatVertexAI
 from dotenv import load_dotenv
 
 from rag_hub.config.settings import GEMINI_LLM_MODEL, CRAG_CONFIDENCE_THRESHOLD
-from rag_hub.config.vertex_ai import init_vertex_ai
+from rag_hub.config.vertex_ai import make_chat_llm
 
 load_dotenv()
-init_vertex_ai()
 
 _LABEL_WEIGHTS = {"relevant": 1.0, "partially_relevant": 0.5, "irrelevant": 0.0}
 
@@ -54,10 +52,7 @@ class CRAGEvaluator:
     ):
         self.threshold = threshold
         self.eval_top_n = eval_top_n
-        self.llm = ChatVertexAI(
-            model_name=model,
-            temperature=0,
-        )
+        self.llm = make_chat_llm(model, temperature=0)
 
     def evaluate(self, question: str, docs: List[Dict]) -> Tuple[float, List[str]]:
         """

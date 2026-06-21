@@ -4,17 +4,15 @@ in the retrieved context. Returns a confidence score [0, 1].
 """
 from typing import List, Dict
 
-from langchain_google_vertexai import ChatVertexAI
 from langchain_core.prompts import ChatPromptTemplate
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field
 
 from rag_hub.config.settings import GEMINI_LLM_MODEL
-from rag_hub.config.vertex_ai import init_vertex_ai
+from rag_hub.config.vertex_ai import make_chat_llm
 from rag_hub.generation.schemas import Answer
 
 load_dotenv()
-init_vertex_ai()
 
 
 class _ScoreResult(BaseModel):
@@ -48,10 +46,7 @@ class SelfRAGScorer:
     """LLM-as-judge: scores answer faithfulness to retrieved context. Returns confidence [0, 1]."""
 
     def __init__(self, model: str = GEMINI_LLM_MODEL):
-        llm = ChatVertexAI(
-            model_name=model,
-            temperature=0,
-        )
+        llm = make_chat_llm(model, temperature=0)
         self._chain = _PROMPT | llm.with_structured_output(_ScoreResult)
 
     def score(self, question: str, answer: Answer, chunks: List[Dict]) -> float:
