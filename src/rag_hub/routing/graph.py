@@ -61,13 +61,16 @@ def _route_selector(state: RouterState) -> str:
 def _crag_selector(state: RouterState) -> str:
     """
     Conditional edge after crag_node.
-    Routes to web_fallback if confidence is below threshold, else generate.
-    web_fallback can be disabled by setting crag_confidence artificially high
-    (done by RetrievalPipeline when web_fallback_enabled=False).
+    Routes to web_fallback if confidence is below the configured threshold, else
+    generate. Threshold and the enable flag are read from state (seeded by the
+    RetrievalPipeline) so a per-run config actually takes effect — falling back
+    to the module default only when unset.
     """
     confidence = state.get("crag_confidence", 1.0)
+    threshold = state.get("crag_threshold", CRAG_THRESHOLD)
+    enabled = state.get("web_fallback_enabled", True)
     # used_fallback being True means we already ran fallback (shouldn't loop)
-    if not state.get("used_fallback") and confidence < CRAG_THRESHOLD:
+    if enabled and not state.get("used_fallback") and confidence < threshold:
         return "web_fallback"
     return "generate"
 

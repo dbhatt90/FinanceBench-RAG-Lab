@@ -12,13 +12,19 @@ companies not in the index.
 
 from typing import List, Dict
 
-from langchain_community.tools import DuckDuckGoSearchRun
-
 
 class WebFallback:
     def __init__(self, max_results: int = 3):
         self.max_results = max_results
-        self._tool = DuckDuckGoSearchRun()
+        # Built lazily so a missing/broken search backend (e.g. the `ddgs`
+        # package) degrades to "no web docs" instead of crashing graph startup.
+        self._tool = None
+
+    def _get_tool(self):
+        if self._tool is None:
+            from langchain_community.tools import DuckDuckGoSearchRun
+            self._tool = DuckDuckGoSearchRun()
+        return self._tool
 
     def search(self, query: str) -> List[Dict]:
         """
@@ -29,8 +35,11 @@ class WebFallback:
         The doc_name encodes the query so it is traceable in logs.
         """
         try:
-            raw = self._tool.run(query)
-        except Exception:
+            raw = self._get_tool().run(query)
+        except Exception as e:
+            # DuckDuckGo throttles aggressively; degrade to no web docs rather
+            # than crash the pipeline. Logged so throttling is visible.
+            print(f"[WebFallback] search failed ({type(e).__name__}: {e}); returning no web docs")
             return []
 
         if not raw or raw.strip() == "":

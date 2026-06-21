@@ -18,6 +18,11 @@ class RouterState(TypedDict, total=False):
       crag_labels      — per-doc relevance labels from CRAG evaluator
       used_fallback    — True if web_fallback_node fired
       reranker_type    — class name of reranker used (for eval logging)
+
+    Pipeline config (seeded by RetrievalPipeline into the initial state so the
+    conditional edges use the configured values, not hardcoded constants):
+      crag_threshold       — confidence below which web fallback fires
+      web_fallback_enabled — if False, CRAG evaluates but never triggers fallback
     """
     question: str
     route: str
@@ -28,3 +33,5 @@ class RouterState(TypedDict, total=False):
     crag_labels: List[str]
     used_fallback: bool
     reranker_type: str
+    crag_threshold: float
+    web_fallback_enabled: bool
