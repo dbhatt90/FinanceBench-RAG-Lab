@@ -21,7 +21,6 @@ python scripts/run_chunker_sweep.py --strategy recursive
 
 import argparse
 import json
-import math
 import os
 from datetime import datetime
 from typing import Callable, Dict, List, Set
@@ -32,7 +31,7 @@ from rag_hub.vectorstore.qdrant_store import QdrantStore
 from rag_hub.retrievers.bm25_retriever import BM25Retriever
 from rag_hub.retrievers.hybrid_retriever import HybridRRFRetriever
 from rag_hub.eval.financebench import load_questions, gold_pages
-from rag_hub.eval.retrieval_metrics import recall_at_k, precision_at_k, mrr, map_at_k
+from rag_hub.eval.retrieval_metrics import recall_at_k, precision_at_k, mrr, map_at_k, ndcg_at_k
 
 
 # ── Config ───────────────────────────────────────────────────────────────────
@@ -83,21 +82,6 @@ def dedupe_ranked(ids: list) -> list:
     return [x for x in ids if not (x in seen or seen.add(x))]
 
 
-def ndcg_at_k(retrieved: List[str], relevant: Set[str], k: int) -> float:
-    """
-    Binary NDCG@k.
-    DCG  = sum  rel_i / log2(i+1)   for i in 1..k
-    IDCG = DCG of perfect ranking (all relevant items at top)
-    """
-    dcg = 0.0
-    for i, doc_id in enumerate(retrieved[:k], start=1):
-        if doc_id in relevant:
-            dcg += 1.0 / math.log2(i + 1)
-
-    ideal_hits = min(len(relevant), k)
-    idcg = sum(1.0 / math.log2(i + 1) for i in range(1, ideal_hits + 1))
-
-    return dcg / idcg if idcg > 0 else 0.0
 
 
 def compute_metrics(retrieved_ids: List[str], relevant_ids: Set[str], k: int = K) -> Dict:

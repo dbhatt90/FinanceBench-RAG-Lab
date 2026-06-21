@@ -1,5 +1,6 @@
 # eval/retrieval_metrics.py
 
+import math
 from typing import List, Set
 
 
@@ -63,6 +64,24 @@ def err_at_k(retrieved: List[str], relevant: Set[str], k: int) -> float:
         prob_not_stopped *= 1.0 - rel
 
     return err
+
+
+def ndcg_at_k(retrieved: List[str], relevant: Set[str], k: int) -> float:
+    """
+    Binary NDCG@k.
+      DCG  = sum_{i=1..k} rel_i / log2(i + 1)
+      IDCG = DCG of the perfect ranking (all relevant items at the top)
+    Returns DCG / IDCG, or 0.0 when there are no relevant docs.
+    """
+    dcg = 0.0
+    for i, doc_id in enumerate(retrieved[:k], start=1):
+        if doc_id in relevant:
+            dcg += 1.0 / math.log2(i + 1)
+
+    ideal_hits = min(len(relevant), k)
+    idcg = sum(1.0 / math.log2(i + 1) for i in range(1, ideal_hits + 1))
+
+    return dcg / idcg if idcg > 0 else 0.0
 
 
 def rrf_score(rank_lists: List[List[str]], k: int = 60) -> dict:

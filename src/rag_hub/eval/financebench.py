@@ -5,6 +5,20 @@ from typing import List, Dict, Set
 
 
 # -----------------------------
+# Chunk-id helpers (shared by all retrieval eval scripts)
+# -----------------------------
+def make_chunk_id(doc_name: str, page) -> str:
+    """Stable id used to match retrieved docs against gold evidence pages."""
+    return f"{doc_name}_p{page}"
+
+
+def dedupe_ranked(ids: List[str]) -> List[str]:
+    """Drop duplicate ids while preserving rank order."""
+    seen: Set[str] = set()
+    return [x for x in ids if not (x in seen or seen.add(x))]
+
+
+# -----------------------------
 # Step 1: Load JSONL questions
 # -----------------------------
 def load_questions(jsonl_path: str) -> List[Dict]:
