@@ -31,6 +31,7 @@ dependencies = [
     "ragas>=0.4.3",
     "mlflow>=2.16.0",
     "streamlit>=1.38.0",
+    "langsmith>=0.1.0",
 ]
 [tool.setuptools.packages.find]
 where = ["src"]
