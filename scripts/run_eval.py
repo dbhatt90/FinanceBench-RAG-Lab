@@ -20,6 +20,7 @@ import sys
 import os
 import json
 import argparse
+from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
 from datetime import datetime
 from typing import Dict, List, Set
 
@@ -64,6 +65,10 @@ def parse_args():
     p.add_argument("--k", type=int, default=5)
     p.add_argument("--limit", type=int, default=50)
     p.add_argument("--no-mlflow", action="store_true", help="skip MLflow logging")
+    p.add_argument("--resume", action="store_true",
+                   help="skip questions already completed in an existing result file")
+    p.add_argument("--timeout", type=int, default=120,
+                   help="seconds before a single question is skipped (default: 120)")
     return p.parse_args()
 
 
@@ -79,19 +84,52 @@ def compute_metrics(retrieved_ids: List[str], relevant_ids: Set[str], k: int) ->
     }
 
 
-def eval_config(name: str, cfg: Dict, questions: List[Dict], k: int) -> Dict:
+def load_checkpoint(name: str, cfg: Dict) -> List[Dict]:
+    day_dir = RESULTS_DIR / f"day{cfg['day']}"
+    path = day_dir / f"retrieval_eval_{name}.json"
+    if path.exists():
+        with open(path) as f:
+            return json.load(f).get("per_question", [])
+    return []
+
+
+def eval_config(name: str, cfg: Dict, questions: List[Dict], k: int,
+                resume: bool = False, timeout: int = 120) -> Dict:
     print(f"\n{'=' * 70}\nCONFIG: {name} (day {cfg['day']}) — {cfg['desc']}\n{'=' * 70}")
-    pipeline = RetrievalPipeline(**cfg["kwargs"])
-    per_question = []
+
+    # Load prior results when resuming
+    done_questions: Dict[str, Dict] = {}
+    if resume:
+        for r in load_checkpoint(name, cfg):
+            if "metrics" in r:
+                done_questions[r["question"]] = r
+        if done_questions:
+            print(f"  [resume] {len(done_questions)} questions already done, skipping them")
+
+    pipeline = None  # lazy init — skip entirely if everything is cached
+    per_question = list(done_questions.values())  # seed with completed results
+
+    # Partial result template for incremental writes
+    partial = {
+        "day": cfg["day"], "config": name, "description": cfg["desc"],
+        "k": k, "params": cfg["kwargs"],
+    }
 
     for i, q in enumerate(questions):
+        if q["question"] in done_questions:
+            print(f"[{i+1:02d}/{len(questions)}] SKIP (cached): {q['question'][:60]}")
+            continue
+        if pipeline is None:
+            pipeline = RetrievalPipeline(**cfg["kwargs"])
         question = q["question"]
         doc_name = q["doc_name"]
         gold = gold_pages(q)
         relevant_ids = {make_chunk_id(doc_name + ".pdf", p) for p in gold}
 
         try:
-            state = pipeline.run_retrieval_only(question)
+            with ThreadPoolExecutor(max_workers=1) as ex:
+                future = ex.submit(pipeline.run_retrieval_only, question)
+                state = future.result(timeout=timeout)
             docs = state.get("reranked_docs") or state.get("docs", [])
             corpus_docs = [d for d in docs if d.get("source") != "web"]
             retrieved_ids = dedupe_ranked(
@@ -107,9 +145,15 @@ def eval_config(name: str, cfg: Dict, questions: List[Dict], k: int) -> Dict:
             })
             print(f"[{i+1:02d}/{len(questions)}] {question[:60]:<60} "
                   f"hit@{k}={metrics[f'hit@{k}']} recall@{k}={metrics[f'recall@{k}']:.2f}")
+        except FuturesTimeoutError:
+            print(f"[{i+1:02d}/{len(questions)}] TIMEOUT ({timeout}s): {question[:60]}")
+            per_question.append({"question": question, "error": f"timeout>{timeout}s"})
         except Exception as e:
             print(f"[{i+1:02d}/{len(questions)}] ERROR: {e}")
             per_question.append({"question": question, "error": str(e)})
+
+        # Incremental checkpoint after every question
+        _write_partial(partial, per_question)
 
     valid = [r for r in per_question if "metrics" in r]
     metric_keys = list(valid[0]["metrics"].keys()) if valid else []
@@ -131,6 +175,24 @@ def eval_config(name: str, cfg: Dict, questions: List[Dict], k: int) -> Dict:
     }
 
 
+def _write_partial(template: Dict, per_question: List[Dict]) -> None:
+    """Write an in-progress result file so --resume can recover after a crash."""
+    valid = [r for r in per_question if "metrics" in r]
+    metric_keys = list(valid[0]["metrics"].keys()) if valid else []
+    overall = {
+        mk: round(sum(r["metrics"][mk] for r in valid) / len(valid), 4)
+        for mk in metric_keys
+    } if valid else {}
+    result = {
+        **template,
+        "n_questions": len(valid),
+        "timestamp": datetime.now().isoformat(timespec="seconds"),
+        "overall": overall,
+        "per_question": per_question,
+    }
+    write_result(result)
+
+
 def write_result(result: Dict) -> str:
     day_dir = RESULTS_DIR / f"day{result['day']}"
     day_dir.mkdir(parents=True, exist_ok=True)
@@ -149,7 +211,7 @@ def main():
     summary = []
     for name in names:
         cfg = CONFIGS[name]
-        result = eval_config(name, cfg, questions, args.k)
+        result = eval_config(name, cfg, questions, args.k, resume=args.resume, timeout=args.timeout)
         path = write_result(result)
         print(f"  → {path}")
         print(f"  overall: {result['overall']}")
