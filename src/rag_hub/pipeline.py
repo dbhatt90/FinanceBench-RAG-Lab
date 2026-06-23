@@ -76,7 +76,11 @@ class RetrievalPipeline:
           question, answer, route, docs, reranked_docs,
           crag_confidence, crag_labels, used_fallback, reranker_type
         """
-        initial = {"question": question}
+        initial = {
+            "question": question,
+            "crag_threshold": self.crag_threshold,
+            "web_fallback_enabled": self.web_fallback_enabled,
+        }
 
         # When CRAG is disabled, pre-set confidence high so _crag_selector
         # always routes to generate without calling the evaluator.
@@ -90,11 +94,6 @@ class RetrievalPipeline:
             _nodes._singletons["crag_evaluator"] = CRAGEvaluator(
                 threshold=self.crag_threshold
             )
-
-        if not self.web_fallback_enabled:
-            _nodes._singletons["_web_fallback_disabled"] = True
-        else:
-            _nodes._singletons.pop("_web_fallback_disabled", None)
 
         return self._graph.invoke(initial)
 
@@ -155,7 +154,11 @@ class RetrievalPipeline:
             g.add_edge("crag", END)
 
         app = g.compile()
-        return app.invoke({"question": question})
+        return app.invoke({
+            "question": question,
+            "crag_threshold": self.crag_threshold,
+            "web_fallback_enabled": self.web_fallback_enabled,
+        })
 
 
 class _DisabledCRAGEvaluator:

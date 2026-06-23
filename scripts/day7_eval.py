@@ -1,0 +1,152 @@
+"""
+Day 7 evaluation: generation quality on FinanceBench.
+
+Metrics per question:
+  exact_match      — gold answer string appears in prediction (most honest for FinanceBench)
+  numeric_match    — extracted numbers agree within 1% tolerance
+  hallucination    — NLI-based sentence entailment rate
+  confidence       — Self-RAG LLM-as-judge score
+  rouge_l          — lexical overlap with gold
+  bert_score       — semantic similarity to gold (optional, slow first load)
+
+Writes: eval_results/day7/results.md + eval_results/day7/raw.json
+"""
+import sys, os, json, argparse
+from datetime import datetime
+from typing import List, Dict
+from statistics import mean
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+
+from rag_hub.config.settings import SMOKE_50_PATH, QDRANT_URL, COLLECTION_NAME, BM25_INDEX_PATH, RESULTS_DIR
+from rag_hub.eval.financebench import load_questions
+from rag_hub.eval.generation_metrics import GenerationMetrics
+from rag_hub.embeddings.gemini_001 import GeminiEmbeddingClient
+from rag_hub.vectorstore.qdrant_store import QdrantStore
+from rag_hub.retrievers.bm25_retriever import BM25Retriever
+from rag_hub.generation.day7_pipeline import Day7Pipeline
+
+SMOKE_PATH = str(SMOKE_50_PATH)
+COLLECTION = COLLECTION_NAME
+BM25_PATH = str(BM25_INDEX_PATH)
+def parse_args():
+    p = argparse.ArgumentParser()
+    p.add_argument("--limit", type=int, default=50)
+    p.add_argument("--no-bert", action="store_true")
+    return p.parse_args()
+
+
+def run_eval(questions, pipeline, metrics, args):
+    rows = []
+    for i, q in enumerate(questions):
+        print(f"[{i+1}/{len(questions)}] {q['question'][:70]}...")
+        result = pipeline.run(q["question"])
+        answer = result["answer"]
+        prediction = answer.text
+        reference = q.get("answer", "")
+        rouge = metrics.rouge_scores(prediction, reference)
+
+        row = {
+            "question": q["question"],
+            "prediction": prediction,
+            "reference": reference,
+            "exact_match": metrics.exact_match(prediction, reference),
+            "numeric_match": metrics.numeric_match(prediction, reference),
+            "hallucination_rate": answer.hallucination_rate,
+            "confidence": answer.confidence,
+            "generation_iterations": answer.generation_iterations,
+            "num_citations": len(answer.citations),
+            **rouge,
+            "bert_score": None,
+        }
+
+        if not args.no_bert and reference and prediction.lower() != "i don't know":
+            try:
+                row["bert_score"] = metrics.bert_score(prediction, reference)
+            except Exception as e:
+                print(f"  [WARN] BERTScore failed: {e}")
+
+        rows.append(row)
+    return rows
+
+
+def write_results(rows):
+    day7_dir = RESULTS_DIR / "day7"
+    day7_dir.mkdir(parents=True, exist_ok=True)
+
+    def avg(vals):
+        v = [x for x in vals if x is not None]
+        return round(mean(v), 4) if v else "—"
+
+    def pct(vals):
+        v = [x for x in vals if x is not None]
+        return f"{100*mean(v):.1f}%" if v else "—"
+
+    corrective_fired = sum(1 for r in rows if r["generation_iterations"] > 1)
+    em_vals = [r["exact_match"] for r in rows]
+    nm_vals = [r["numeric_match"] for r in rows if r["numeric_match"] is not None]
+
+    md = [
+        f"# Day 7 Eval Results — {datetime.now().strftime('%Y-%m-%d %H:%M')}",
+        f"\n**Questions evaluated:** {len(rows)}  |  "
+        f"**Corrective loop fired:** {corrective_fired}/{len(rows)} ({100*corrective_fired/len(rows):.1f}%)  |  "
+        f"**Citations present:** {sum(1 for r in rows if r['num_citations'] > 0)}/{len(rows)}",
+        "\n## Aggregate Metrics\n",
+        "| Metric | Value | Notes |",
+        "|--------|-------|-------|",
+        f"| **Exact Match** | {pct(em_vals)} | Gold string found in prediction |",
+        f"| **Numeric Match** (±1%) | {pct(nm_vals)} | Numeric answers within 1% of gold (n={len(nm_vals)}) |",
+        f"| Self-RAG Confidence | {avg([r['confidence'] for r in rows])} | LLM judge [0-1] |",
+        f"| Hallucination Rate | {avg([r['hallucination_rate'] for r in rows])} | NLI-based, see note below |",
+        f"| ROUGE-L | {avg([r['rougeL'] for r in rows])} | Low due to verbose vs. short gold |",
+        f"| BERTScore F1 | {avg([r['bert_score'] for r in rows])} | Semantic similarity to gold |",
+        "\n> **Note on Hallucination Rate:** NLI checks sentence entailment against cited quotes.",
+        "> High rate on FinanceBench is expected — numeric reasoning sentences (\"average is 10.3%\")",
+        "> are not syntactically entailed by table excerpts even when the answer is correct.",
+        "> Use Exact Match and Numeric Match as the primary correctness signals.\n",
+        "## Per-Question Results\n",
+        "| # | Question (truncated) | Prediction | Gold | EM | NM | Conf | H-Rate | RougeL |",
+        "|---|---------------------|------------|------|----|----|------|--------|--------|",
+    ]
+
+    for i, r in enumerate(rows, 1):
+        em = "✅" if r["exact_match"] else "❌"
+        nm_val = r["numeric_match"]
+        nm = "✅" if nm_val is True else ("❌" if nm_val is False else "—")
+        q_short = r["question"][:45].replace("|", "/") + "…"
+        pred_short = r["prediction"][:40].replace("|", "/") + "…"
+        md.append(
+            f"| {i} | {q_short} | {pred_short} | {r['reference']} "
+            f"| {em} | {nm} | {r['confidence']} | {r['hallucination_rate']} | {r['rougeL']} |"
+        )
+
+    path = day7_dir / "results.md"
+    with open(path, "w") as f:
+        f.write("\n".join(md))
+
+    json_path = day7_dir / "raw.json"
+    with open(json_path, "w") as f:
+        json.dump(rows, f, indent=2)
+
+    print(f"\nResults → {path}")
+    print(f"Exact Match: {pct(em_vals)}  |  Numeric Match: {pct(nm_vals)}  |  ROUGE-L: {avg([r['rougeL'] for r in rows])}")
+
+
+def main():
+    args = parse_args()
+    questions = load_questions(SMOKE_PATH)[:args.limit]
+    print(f"Loaded {len(questions)} questions")
+
+    embedder = GeminiEmbeddingClient()
+    store = QdrantStore(url=QDRANT_URL, collection=COLLECTION)
+    bm25 = BM25Retriever()
+    bm25.build_from_qdrant(store)
+    pipeline = Day7Pipeline(store=store, bm25=bm25, embedder=embedder)
+    metrics = GenerationMetrics()
+
+    rows = run_eval(questions, pipeline, metrics, args)
+    write_results(rows)
+
+
+if __name__ == "__main__":
+    main()

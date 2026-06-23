@@ -28,7 +28,7 @@ from typing import Dict, List, Set
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from rag_hub.eval.financebench import load_questions, gold_pages
+from rag_hub.eval.financebench import load_questions, gold_pages, make_chunk_id, dedupe_ranked
 from rag_hub.eval.retrieval_metrics import (
     recall_at_k, precision_at_k, mrr, map_at_k, hit_rate_at_k, err_at_k,
 )
@@ -46,17 +46,8 @@ K = 5
 RUN_COLBERT = True
 
 # ---------------------------------------------------------------------------
-# Helpers
+# Helpers  (make_chunk_id / dedupe_ranked are shared via rag_hub.eval.financebench)
 # ---------------------------------------------------------------------------
-
-def make_chunk_id(doc_name: str, page: int) -> str:
-    return f"{doc_name}_p{page}"
-
-
-def dedupe_ranked(ids: List[str]) -> List[str]:
-    seen: Set[str] = set()
-    return [x for x in ids if not (x in seen or seen.add(x))]
-
 
 def compute_metrics(retrieved_ids: List[str], relevant_ids: Set[str]) -> Dict:
     return {

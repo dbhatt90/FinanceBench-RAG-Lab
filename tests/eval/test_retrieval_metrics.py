@@ -1,3 +1,5 @@
+import math
+
 import pytest
 
 from rag_hub.eval.retrieval_metrics import (
@@ -6,6 +8,7 @@ from rag_hub.eval.retrieval_metrics import (
     mrr,
     map_at_k,
     hit_rate_at_k,
+    ndcg_at_k,
     rrf_score,
 )
 
@@ -70,6 +73,21 @@ def test_map_at_k():
 
 
 # -----------------------------
+# NDCG@k
+# -----------------------------
+def test_ndcg_at_k():
+    # Relevant B@2, D@4. DCG = 1/log2(3) + 1/log2(5).
+    # IDCG (2 relevant at top) = 1/log2(2) + 1/log2(3).
+    dcg = 1 / math.log2(3) + 1 / math.log2(5)
+    idcg = 1 / math.log2(2) + 1 / math.log2(3)
+    assert ndcg_at_k(retrieved, relevant, k=5) == pytest.approx(dcg / idcg)
+
+
+def test_ndcg_perfect_ranking_is_one():
+    assert ndcg_at_k(["B", "D", "A"], {"B", "D"}, k=5) == pytest.approx(1.0)
+
+
+# -----------------------------
 # RRF Score
 # -----------------------------
 def test_rrf_score():
@@ -93,6 +111,7 @@ def test_empty_relevant():
     assert precision_at_k(retrieved, set(), k=5) == 0.0
     assert mrr(retrieved, set()) == 0.0
     assert map_at_k(retrieved, set(), k=5) == 0.0
+    assert ndcg_at_k(retrieved, set(), k=5) == 0.0
 
 
 def test_no_overlap():

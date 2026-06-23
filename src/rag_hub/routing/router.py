@@ -31,29 +31,18 @@ Routes:
                + specific question.
 """
 
-import os
 from typing import Literal
 
-import vertexai
-from langchain_google_vertexai import ChatVertexAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
-from google.oauth2 import service_account
 from dotenv import load_dotenv
+
+from rag_hub.config.settings import GEMINI_LLM_MODEL
+from rag_hub.config.vertex_ai import make_chat_llm
 
 load_dotenv()
 
 Route = Literal["direct", "hyde", "decompose", "stepback"]
-
-_credentials = service_account.Credentials.from_service_account_file(
-    os.getenv("GOOGLE_APPLICATION_CREDENTIALS"),
-    scopes=["https://www.googleapis.com/auth/cloud-platform"],
-)
-vertexai.init(
-    project=os.getenv("GCP_PROJECT_ID"),
-    location=os.getenv("GCP_LOCATION", "us-central1"),
-    credentials=_credentials,
-)
 
 # ---------------------------------------------------------------------------
 # LLM classifier prompt
@@ -168,15 +157,9 @@ class QuestionRouter:
         # → "direct"
     """
 
-    def __init__(self, model: str = "gemini-2.5-flash", verbose: bool = True):
+    def __init__(self, model: str = GEMINI_LLM_MODEL, verbose: bool = True):
         self.verbose = verbose
-        self.llm = ChatVertexAI(
-            model_name=model,
-            temperature=0.0,
-            project=os.getenv("GCP_PROJECT_ID"),
-            location=os.getenv("GCP_LOCATION", "us-central1"),
-            credentials=_credentials,
-        )
+        self.llm = make_chat_llm(model, temperature=0.0)
         self.chain = (
             ChatPromptTemplate.from_template(_CLASSIFY_PROMPT)
             | self.llm

@@ -1,26 +1,14 @@
-import os
 import re
 from typing import List
 
-import vertexai
-from langchain_google_vertexai import ChatVertexAI
 from langchain_core.prompts import ChatPromptTemplate
-from google.oauth2 import service_account
 from dotenv import load_dotenv
 
+from rag_hub.config.settings import GEMINI_LLM_MODEL
+from rag_hub.config.vertex_ai import make_chat_llm
 from rag_hub.query.base import QueryTransform
 
 load_dotenv()
-
-_credentials = service_account.Credentials.from_service_account_file(
-    os.getenv("GOOGLE_APPLICATION_CREDENTIALS"),
-    scopes=["https://www.googleapis.com/auth/cloud-platform"],
-)
-vertexai.init(
-    project=os.getenv("GCP_PROJECT_ID"),
-    location=os.getenv("GCP_LOCATION", "us-central1"),
-    credentials=_credentials,
-)
 
 MULTI_QUERY_PROMPT_TEMPLATE = """\
 You are helping improve document retrieval over SEC 10-K and 10Q filings.
@@ -47,15 +35,9 @@ class MultiQueryTransform(QueryTransform):
     Used as a building block inside RAGFusionRetriever.
     """
 
-    def __init__(self, n: int = 3, model: str = "gemini-2.5-flash"):
+    def __init__(self, n: int = 3, model: str = GEMINI_LLM_MODEL):
         self.n = n
-        self.llm = ChatVertexAI(
-            model_name=model,
-            temperature=0.4,
-            project=os.getenv("GCP_PROJECT_ID"),
-            location=os.getenv("GCP_LOCATION", "us-central1"),
-            credentials=_credentials,
-        )
+        self.llm = make_chat_llm(model, temperature=0.4)
         self.prompt = ChatPromptTemplate.from_template(MULTI_QUERY_PROMPT_TEMPLATE)
         self.chain = self.prompt | self.llm
 

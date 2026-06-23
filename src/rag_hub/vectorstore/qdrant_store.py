@@ -1,4 +1,3 @@
-import os
 from typing import List, Dict, Optional
 
 from qdrant_client import QdrantClient
@@ -13,6 +12,8 @@ from qdrant_client.models import (
 
 from dotenv import load_dotenv
 
+from rag_hub.config.settings import QDRANT_URL as _DEFAULT_QDRANT_URL, EMBEDDING_DIM
+
 load_dotenv()
 
 
@@ -22,7 +23,7 @@ class QdrantStore:
     """
 
     def __init__(self, url: str = None, collection: str = "rag_chunks"):
-        self.url = url or os.getenv("QDRANT_URL", "http://localhost:6333")
+        self.url = url or _DEFAULT_QDRANT_URL
         self.collection = collection
 
         self.client = QdrantClient(url=self.url)
@@ -30,7 +31,7 @@ class QdrantStore:
     # -----------------------------
     # Collection setup
     # -----------------------------
-    def ensure_collection(self, dim: int = 768, force: bool = False):
+    def ensure_collection(self, dim: int = EMBEDDING_DIM, force: bool = False):
         """
         Create collection if it doesn't exist.
 

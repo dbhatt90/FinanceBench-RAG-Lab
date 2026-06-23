@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    width: 1080px; height: 1080px;
+    background: #0d1117;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 52px 56px;
+  }
+
+  .title {
+    color: #e6edf3;
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    text-align: center;
+  }
+  .subtitle {
+    color: #7d8590;
+    font-size: 12px;
+    margin-bottom: 38px;
+    text-align: center;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    width: 100%;
+    margin-bottom: 24px;
+  }
+
+  .card {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 14px;
+    padding: 22px 22px 18px;
+  }
+  .card.good  { border-color: #3fb95066; }
+  .card.bad   { border-color: #f8514966; }
+  .card.warn  { border-color: #d2992166; }
+
+  .card-header {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 12px;
+  }
+  .badge {
+    font-size: 11px; font-weight: 700;
+    padding: 3px 9px; border-radius: 20px;
+    letter-spacing: 0.5px;
+  }
+  .badge.good  { background: #0d3320; color: #3fb950; }
+  .badge.bad   { background: #3d0d0d; color: #f85149; }
+  .badge.warn  { background: #2d1f00; color: #d29921; }
+
+  .metric-name {
+    font-size: 16px; font-weight: 700;
+    color: #e6edf3;
+  }
+
+  .metric-what {
+    font-size: 12px; color: #8b949e;
+    line-height: 1.55;
+    margin-bottom: 10px;
+  }
+
+  .example {
+    background: #1c2128;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 11px;
+    color: #7d8590;
+    line-height: 1.6;
+    border-left: 3px solid #30363d;
+  }
+  .example.good { border-left-color: #3fb950; }
+  .example.bad  { border-left-color: #f85149; }
+  .example.warn { border-left-color: #d29921; }
+
+  .highlight { color: #e6edf3; font-weight: 600; }
+  .green  { color: #3fb950; }
+  .red    { color: #f85149; }
+  .yellow { color: #d29921; }
+  .blue   { color: #79c0ff; }
+
+  .takeaway {
+    width: 100%;
+    background: linear-gradient(135deg, #1a2744, #0d2035);
+    border: 1px solid #79c0ff44;
+    border-radius: 14px;
+    padding: 18px 24px;
+    display: flex; align-items: flex-start; gap: 14px;
+  }
+  .takeaway-icon { font-size: 28px; flex-shrink: 0; margin-top: 2px; }
+  .takeaway-text { font-size: 13px; color: #8b949e; line-height: 1.65; }
+  .takeaway-text strong { color: #79c0ff; }
+
+  .footer {
+    margin-top: 22px;
+    color: #484f58;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+
+<div class="title">Which Metrics Actually Work for Financial RAG?</div>
+<div class="subtitle">Day 7/14 · RAG From Zero → Production</div>
+
+<div class="grid">
+
+  <!-- Exact Match -->
+  <div class="card good">
+    <div class="card-header">
+      <span class="badge good">✓ USE THIS</span>
+    </div>
+    <div class="metric-name">Exact Match</div>
+    <div class="metric-what">Does the gold answer string appear anywhere in the prediction? Simple, fast, no model needed.</div>
+    <div class="example good">
+      Gold: <span class="highlight">"10.3%"</span><br>
+      Prediction: <span class="highlight">"…margin for Corning is 10.3%."</span><br>
+      Result: <span class="green">✓ Match</span>
+    </div>
+  </div>
+
+  <!-- Numeric Match -->
+  <div class="card good">
+    <div class="card-header">
+      <span class="badge good">✓ USE THIS</span>
+    </div>
+    <div class="metric-name">Numeric Match  <span style="color:#7d8590;font-size:12px;font-weight:400">(±1%)</span></div>
+    <div class="metric-what">Extract numbers from both strings. Do they agree within 1% tolerance? Handles unit variations.</div>
+    <div class="example good">
+      Gold: <span class="highlight">"$7.2B"</span> → 7.2<br>
+      Prediction: <span class="highlight">"$7,200M"</span> → 7200 / 1000 = 7.2<br>
+      Result: <span class="green">✓ Within 1%</span>
+    </div>
+  </div>
+
+  <!-- ROUGE -->
+  <div class="card bad">
+    <div class="card-header">
+      <span class="badge bad">✗ MISLEADING</span>
+    </div>
+    <div class="metric-name">ROUGE-L</div>
+    <div class="metric-what">Lexical overlap. Built for paragraph summarisation. Punishes full sentences against one-word golds.</div>
+    <div class="example bad">
+      Gold: <span class="highlight">"10.3%"</span><br>
+      Prediction: <span class="highlight">"The 3-year average is 10.3%."</span><br>
+      ROUGE-L: <span class="red">0.21 ← looks wrong, is right</span>
+    </div>
+  </div>
+
+  <!-- Self-RAG -->
+  <div class="card warn">
+    <div class="card-header">
+      <span class="badge warn">~ COMPLEMENTARY</span>
+    </div>
+    <div class="metric-name">Self-RAG Confidence</div>
+    <div class="metric-what">LLM judges its own answer against retrieved context. No gold label needed — useful for production monitoring.</div>
+    <div class="example warn">
+      No gold required<br>
+      Avg on FinanceBench: <span class="yellow">0.87 / 1.0</span><br>
+      Cost: <span class="yellow">+1 LLM call per query</span>
+    </div>
+  </div>
+
+  <!-- BERTScore -->
+  <div class="card warn">
+    <div class="card-header">
+      <span class="badge warn">~ USE CAREFULLY</span>
+    </div>
+    <div class="metric-name">BERTScore F1</div>
+    <div class="metric-what">Semantic similarity using contextual embeddings. Better than ROUGE but still diluted by verbose answers.</div>
+    <div class="example warn">
+      Avg on FinanceBench: <span class="yellow">0.28 / 1.0</span><br>
+      Better than ROUGE, still low<br>
+      Cost: <span class="yellow">~1.5 GB model, local</span>
+    </div>
+  </div>
+
+  <!-- NLI Hallucination -->
+  <div class="card bad">
+    <div class="card-header">
+      <span class="badge bad">✗ DOMAIN MISMATCH</span>
+    </div>
+    <div class="metric-name">NLI Hallucination Rate</div>
+    <div class="metric-what">Entailment check: does the cited quote prove the sentence? Fails on arithmetic — can't derive "10.3%" from a raw table.</div>
+    <div class="example bad">
+      Correct answer → <span class="red">hallucination=1.0</span><br>
+      NLI can't do math<br>
+      Useful for <span class="highlight">prose</span>, not <span class="highlight">financials</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- Takeaway -->
+<div class="takeaway">
+  <div class="takeaway-icon">💡</div>
+  <div class="takeaway-text">
+    <strong>The lesson:</strong> Borrowing NLP benchmark metrics for financial RAG gives you misleading signal.
+    ROUGE was designed for news summarisation. NLI was designed for natural language inference — not balance sheets.
+    <strong>Exact Match + Numeric Match</strong> are simpler, faster, and actually tell you if the answer is right.
+    Domain-appropriate eval is half the engineering work.
+  </div>
+</div>
+
+<div class="footer">github.com/dbhatt90 · #BuildInPublic · Day 7/14</div>
+
+</body>
+</html>
